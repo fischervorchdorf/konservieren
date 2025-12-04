@@ -31,43 +31,126 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--museum-paper);
             min-height: 100vh;
-            padding: 20px;
+            margin: 0;
+            padding: 0;
             color: var(--museum-charcoal);
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
         }
 
-        .container {
-            max-width: 900px;
+        /* Dark Header wie WasBinIch */
+        .header {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .header-content {
+            max-width: 1200px;
             margin: 0 auto;
-            background: white;
-            border-radius: 2px;
-            padding: 40px;
-            box-shadow: 0 10px 30px -10px rgba(28, 27, 26, 0.15);
-            border: 1px solid var(--museum-stone);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        h1 {
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--museum-gold);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .header-title {
             font-family: 'Cinzel', serif;
-            color: var(--museum-charcoal);
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 36px;
+            font-size: 24px;
             font-weight: 700;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.1em;
+        }
+
+        .header-subtitle {
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .header-badge {
+            background: rgba(217, 119, 6, 0.2);
+            border: 1px solid var(--museum-gold);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            color: var(--museum-gold);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        /* Hero Section wie WasBinIch */
+        .hero {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 60px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border: 2px solid rgba(217, 119, 6, 0.3);
+            border-radius: 50px;
+            background: rgba(217, 119, 6, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .hero-badge-text {
+            color: var(--museum-gold);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            font-family: 'Cinzel', serif;
+            font-size: 56px;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            font-weight: 400;
+            color: var(--museum-charcoal);
+        }
+
+        .hero-title-emphasis {
+            display: block;
+            font-weight: 700;
+            font-style: italic;
             background: linear-gradient(135deg, var(--gold-gradient-start), var(--gold-gradient-end));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            text-transform: uppercase;
         }
 
-        .subtitle {
-            text-align: center;
-            color: var(--museum-gold);
-            margin-bottom: 40px;
-            font-size: 14px;
-            font-weight: 500;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
+        .hero-description {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #6b7280;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         .api-key-section {
@@ -218,10 +301,103 @@
             display: none;
         }
 
-        .upload-section h3 {
-            color: #495057;
-            margin-bottom: 15px;
-            font-size: 18px;
+        /* Modern Upload Area wie WasBinIch */
+        .upload-area {
+            border: 2px dashed rgba(217, 119, 6, 0.4);
+            border-radius: 16px;
+            padding: 48px 32px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: all 0.3s;
+            margin-bottom: 40px;
+        }
+
+        .upload-area:hover {
+            border-color: var(--museum-gold);
+            background: rgba(217, 119, 6, 0.02);
+        }
+
+        .upload-icon-container {
+            width: 80px;
+            height: 80px;
+            background: rgba(217, 119, 6, 0.1);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .upload-icon {
+            font-size: 40px;
+        }
+
+        .upload-title {
+            font-family: 'Cinzel', serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--museum-charcoal);
+            margin-bottom: 12px;
+        }
+
+        .upload-description {
+            color: #6b7280;
+            margin-bottom: 32px;
+            font-size: 15px;
+            line-height: 1.6;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .upload-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .upload-button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-button-gallery {
+            background: var(--museum-charcoal);
+            color: white;
+            border: none;
+        }
+
+        .upload-button-gallery:hover {
+            background: #111827;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .upload-button-camera {
+            background: linear-gradient(135deg, var(--gold-gradient-start), var(--gold-gradient-end));
+            color: white;
+            border: none;
+        }
+
+        .upload-button-camera:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(217, 119, 6, 0.3);
+        }
+
+        .upload-hint {
+            font-size: 13px;
+            color: #9ca3af;
         }
 
         .images-grid {
@@ -486,10 +662,38 @@
 </head>
 
 <body>
+    <!-- Dark Header wie WasBinIch -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-logo">
+                <div class="header-icon">🏛️</div>
+                <div>
+                    <div class="header-title">KONSERVIEREN</div>
+                    <div class="header-subtitle">Artefakt-Analyse für Museum & Archiv</div>
+                </div>
+            </div>
+            <div class="header-badge">
+                ✨ KI-Powered
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
     <div class="container">
-        <h1>🏛️ Konservieren <span style="font-size: 14px; font-weight: 400; color: var(--museum-gold);">v2.1</span>
-        </h1>
-        <div class="subtitle">Artefakt-Analyse für Museum & Archiv</div>
+        <!-- Hero Section wie WasBinIch -->
+        <div class="hero" id="heroSection">
+            <div class="hero-badge">
+                <span class="hero-badge-text">KI-Powered Konservierungs-Analyse</span>
+            </div>
+            <h1 class="hero-title">
+                Jedes Artefakt
+                <span class="hero-title-emphasis">braucht Pflege</span>
+            </h1>
+            <p class="hero-description">
+                Lade Bilder deines Artefakts hoch und erhalte eine detaillierte Konservierungsanalyse –
+                wissenschaftlich fundiert und praxisnah für Museums- und Archivbestände.
+            </p>
+        </div>
 
         <!-- API Key Eingabe -->
         <div id="apiKeySection" class="api-key-section">
@@ -534,22 +738,38 @@
 
         <!-- Upload Bereich -->
         <div id="uploadSection" class="upload-section hidden">
-            <h3>📸 Artefakt dokumentieren (bis zu 4 Bilder)</h3>
-            <p style="color: #6c757d; font-size: 14px; margin-bottom: 15px;">
-                Lade alle Bilder auf einmal hoch oder füge sie einzeln hinzu. Für jedes Bild kannst du
-                Kontext-Informationen angeben.
-            </p>
+            <!-- Modern Upload Area wie WasBinIch -->
+            <div class="upload-area">
+                <div class="upload-icon-container">
+                    <span class="upload-icon">📤</span>
+                </div>
+                <h2 class="upload-title">Artefakt hochladen</h2>
+                <p class="upload-description">
+                    Lade 1-4 Bilder deines Artefakts hoch oder mache ein Foto. Mehrere Perspektiven helfen bei der
+                    Analyse.
+                </p>
 
-            <!-- Central Multi-Upload Button -->
-            <div style="text-align: center; margin-bottom: 30px;">
-                <input type="file" id="multiImageInput" accept="image/*" multiple style="display: none;"
-                    onchange="handleMultiImageUpload(event)">
-                <button class="btn btn-primary" onclick="document.getElementById('multiImageInput').click()"
-                    style="padding: 16px 40px; font-size: 14px;">
-                    📷 Alle Bilder auswählen (bis zu 4)
-                </button>
-                <p style="color: #6c757d; font-size: 12px; margin-top: 10px;">
-                    💡 Oder füge Bilder einzeln über die Slots hinzu
+                <!-- Upload Buttons wie WasBinIch -->
+                <div class="upload-buttons">
+                    <input type="file" id="galleryInput" accept="image/*" multiple style="display: none;"
+                        onchange="handleMultiImageUpload(event)">
+                    <button class="upload-button upload-button-gallery"
+                        onclick="document.getElementById('galleryInput').click()">
+                        <span>🖼️</span>
+                        <span>Galerie</span>
+                    </button>
+
+                    <input type="file" id="cameraInput" accept="image/*" capture="environment" multiple
+                        style="display: none;" onchange="handleMultiImageUpload(event)">
+                    <button class="upload-button upload-button-camera"
+                        onclick="document.getElementById('cameraInput').click()">
+                        <span>📷</span>
+                        <span>Foto aufnehmen</span>
+                    </button>
+                </div>
+
+                <p class="upload-hint">
+                    💡 Mehrere Perspektiven helfen bei der Identifizierung
                 </p>
             </div>
 
