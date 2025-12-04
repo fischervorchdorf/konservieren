@@ -668,7 +668,8 @@
             <div class="header-logo">
                 <div class="header-icon">🏛️</div>
                 <div>
-                    <div class="header-title">KONSERVIEREN</div>
+                    <div class="header-title">KONSERVIEREN <span
+                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.3</span></div>
                     <div class="header-subtitle">Artefakt-Analyse für Museum & Archiv</div>
                 </div>
             </div>
@@ -875,45 +876,15 @@
         let contextTexts = ['', '', '', ''];
         let selectedUsage = null;
         let currentAnalysis = null;
-        let apiKey = '';
+        let apiKey = 'AIzaSyBudkecvmZX9cRyXRaPw16Fct2MbGDBQog'; // Shared domain-restricted key (fischervorchdorf.github.io/*)
 
-        // Check for stored API key on load
+        // Automatically show usage selection on load
         window.onload = function () {
-            const storedKey = localStorage.getItem('geminiApiKey');
-            if (storedKey && storedKey.trim().length > 0) {
-                apiKey = storedKey;
-                document.getElementById('apiKeySection').classList.add('hidden');
-                document.getElementById('usageSection').classList.remove('hidden');
-            } else {
-                // Show API key input
-                document.getElementById('apiKeySection').classList.remove('hidden');
-                document.getElementById('usageSection').classList.add('hidden');
-            }
-        };
-
-        function saveApiKey() {
-            const input = document.getElementById('apiKeyInput');
-            const key = input.value.trim();
-
-            if (!key || key.length < 20) {
-                showError('Bitte gib einen gültigen API-Key ein (mindestens 20 Zeichen).');
-                return;
-            }
-
-            if (!key.startsWith('AIzaSy')) {
-                showError('Der API-Key sollte mit "AIzaSy" beginnen. Bitte überprüfe deinen Key.');
-                return;
-            }
-
-            // Save to localStorage
-            localStorage.setItem('geminiApiKey', key);
-            apiKey = key;
-
-            // Hide API section, show usage section
-            document.getElementById('apiKeySection').classList.add('hidden');
+            // Hide hero section and show usage selection directly
+            document.getElementById('heroSection').style.display = 'none';
             document.getElementById('usageSection').classList.remove('hidden');
-            hideError();
-        }
+            document.getElementById('apiKeySection').classList.add('hidden'); // Ensure API key section is hidden
+        };
 
 
         function selectUsage(usage) {
