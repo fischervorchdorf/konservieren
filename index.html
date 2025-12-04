@@ -669,7 +669,7 @@
                 <div class="header-icon">🏛️</div>
                 <div>
                     <div class="header-title">KONSERVIEREN <span
-                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.3</span></div>
+                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.4</span></div>
                     <div class="header-subtitle">Artefakt-Analyse für Museum & Archiv</div>
                 </div>
             </div>
@@ -880,8 +880,7 @@
 
         // Automatically show usage selection on load
         window.onload = function () {
-            // Hide hero section and show usage selection directly
-            document.getElementById('heroSection').style.display = 'none';
+            // Show usage selection directly, keep hero section visible
             document.getElementById('usageSection').classList.remove('hidden');
             document.getElementById('apiKeySection').classList.add('hidden'); // Ensure API key section is hidden
         };
@@ -1083,8 +1082,9 @@
                     }
                 }
 
-                // Anfrage an Google Gemini API
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`, {
+                // Anfrage an Google Gemini
+                // Using gemini-1.5-pro for better scientific reasoning
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1138,84 +1138,47 @@
 
             const usage = selectedUsage ? usageTexts[selectedUsage] : 'Nicht angegeben';
 
-            return `Du bist ein Experte für Konservierung und Restaurierung von Museumsobjekten. Analysiere das/die hochgeladene(n) Bild(er) eines Artefakts sehr detailliert im Hinblick auf Konservierung und Erhaltung.
+            return `Du bist ein wissenschaftlicher Experte für Konservierung und Restaurierung von Museumsobjekten (Conservator-Restorer).
+Analysiere das/die hochgeladene(n) Bild(er) eines Artefakts streng wissenschaftlich und detailliert.
+Deine Aussagen müssen valide, fachlich korrekt und überprüfbar sein.
 
 VERWENDUNGSZWECK: ${usage}
 
-Bitte analysiere folgende Aspekte SEHR DETAILLIERT und wissenschaftlich fundiert:
+Bitte erstelle ein professionelles Konservierungsgutachten mit folgenden Punkten:
 
-1. MATERIAL-IDENTIFIKATION:
-   - Um welches Material handelt es sich? (Holz, Metall, Papier, Textil, Keramik, Glas, etc.)
-   - Wenn mehrere Materialien: genaue Auflistung aller Komponenten
-   - Materialbesonderheiten (Holzart, Metalllegierung, Papiertyp, etc.)
+1. WISSENSCHAFTLICHE MATERIAL-IDENTIFIKATION:
+   - Präzise Bestimmung der Materialien (z.B. nicht nur "Holz", sondern "Nadelholz, vermutlich Fichte/Tanne" wenn erkennbar)
+   - Identifikation von Herstellungstechniken
+   - Materialkombinationen und deren Wechselwirkungen
 
-2. ERHALTUNGSZUSTAND (detaillierte Schadensdokumentation):
-   - Sichtbare Schäden (Risse, Brüche, Fehlstellen)
-   - Oberflächenveränderungen (Verfärbungen, Flecken, Ausbleichungen)
-   - Korrosion oder Oxidation (bei Metall)
-   - Schimmel, Insektenbefall, Holzwürmer
-   - Mechanische Beschädigungen
-   - Alterungserscheinungen
-   - Frühere Restaurierungen erkennbar?
+2. DETAILLIERTE ZUSTANDSANALYSE (Condition Report):
+   - Systematische Erfassung aller Schäden (Kartierung)
+   - Differenzierung zwischen historischen Schäden (Patina) und aktiven Schäden
+   - Ursachenanalyse für jeden Schaden (z.B. "Rissbildung durch hygroskopische Spannungen")
 
-3. AKUTE GEFAHREN & PROBLEME:
-   - Welche Schäden sind JETZT sichtbar?
-   - Welche Probleme werden sich in Zukunft entwickeln?
-   - Dringlichkeit der Behandlung (sofort, kurzfristig, mittelfristig)
+3. RISIKOBEWERTUNG (Risk Assessment):
+   - Akute Gefahren für die Substanz
+   - Langfristige Degradationsprozesse
+   - Risiken durch den geplanten Verwendungszweck (${usage})
 
-4. EMPFOHLENE KONSERVIERUNGSMASSNAHMEN:
-   - Sofortmaßnahmen zur Stabilisierung
-   - Reinigungsempfehlungen (Methoden, Materialien, Vorsichtsmaßnahmen)
-   - Notwendige Reparaturen und Restaurierungen
-   - Schädlingsbekämpfung falls nötig (Vergasung, Tiefkühlung, chemische Behandlung)
+4. KONSERVIERUNGSKONZEPT (Maßnahmen):
+   - Präventive Konservierung (Klima, Licht, Lagerung) mit KONKRETEN WERTEN (Lux, µW/lm, °C, rF%)
+   - Konservatorische Sicherungsmaßnahmen (nur reversible Eingriffe)
+   - Restaurierungsvorschläge (falls ästhetisch oder strukturell notwendig)
+   - Empfohlene Materialien für Lagerung/Verpackung (z.B. "säurefreies Seidenpapier nach ISO 9706")
 
-5. LAGERUNGSEMPFEHLUNGEN (spezifisch für das Material):
-   - Optimale Temperatur (°C)
-   - Optimale relative Luftfeuchtigkeit (%)
-   - UV-Schutz und Lichtexposition (Lux-Werte)
-   - Verpackungsmaterial (säurefreies Papier, Seidenpapier, Tyvek, etc.)
-   - Lagerungsposition und Unterstützung
-   - Box/Behälter-Empfehlungen
-   - Dunkle vs. klimatisierte Lagerung
+5. QUELLENVERZEICHNIS & LITERATUR:
+   - Liste am Ende UNBEDINGT die verwendeten wissenschaftlichen Quellen, Normen und Richtlinien auf.
+   - Zitiere relevante Standards (DIN, EN, ISO) oder Fachliteratur (z.B. ICOM-CC, IIC).
+   - Gib Links zu vertrauenswürdigen Online-Ressourcen an (z.B. hornemann-institut.de, canada.ca/conservation, etc.).
 
-6. AUSSTELLUNGSBEDINGUNGEN (falls relevant):
-   - Unterschied zwischen Depot und Ausstellung
-   - Maximale Lichtexposition (Lux und Stunden pro Tag)
-   - UV-Filter und Beleuchtung
-   - Vitrinen-Empfehlungen
-   - Besucherschutz vs. Sichtbarkeit
-   - Klimakontrolle in Ausstellungsräumen
+WICHTIG:
+- Arbeite streng wissenschaftlich.
+- Unterscheide klar zwischen Fakten (sichtbar) und Vermutungen.
+- Verwende die korrekte Fachterminologie.
+- Gib am Ende IMMER eine Liste der verwendeten Quellen und Links an.
 
-7. TRANSPORT-EMPFEHLUNGEN (falls relevant):
-   - Verpackungsmethode
-   - Polsterung und Fixierung
-   - Klimatische Bedingungen während Transport
-   - Vibrations- und Stoßschutz
-
-8. MATERIALSPEZIFISCHE HINWEISE:
-
-   HOLZ: Holzwürmer, Risse, Feuchtigkeit, Pilzbefall, Holzart-spezifische Probleme
-   METALL: Korrosion, Rost, Grünspan, Patina (erhaltenswert?), Reinigungsmittel
-   PAPIER/PERGAMENT: Säurefraß, Vergilbung, Risse, Tintenkorrosion, Schimmel
-   TEXTIL: Faserzerfall, Lichtschäden, Flecken, Insekten (Motten)
-   LEDER: Austrocknung, Risse, Red Rot (Pulverisierung), Fettung
-   GLAS: Risse, Glaskorrosion, Weeping Glass, Reinigung
-   KERAMIK: Risse, Abplatzungen, Salzausblühungen
-   GEMÄLDE: Craquelé, Farbabblätterung, Firnis-Vergilbung, Leinwandschäden
-   FOTOGRAFIE: Verblassen, Silberspiegelung, Verfärbung, Emulsionsablösung
-
-9. WISSENSCHAFTLICHE QUELLEN & STANDARDS:
-   - Nenne relevante Konservierungsstandards (z.B. DIN, ISO, IIC)
-   - Falls möglich: Referenz zu Fachpublikationen
-
-10. ZUSAMMENFASSUNG & PRIORITÄTEN:
-   - Die 3 wichtigsten Sofortmaßnahmen
-   - Langfristige Konservierungsstrategie
-   - Geschätzte Kosten und Aufwand (grobe Einschätzung)
-
-WICHTIG: Sei sehr detailliert und wissenschaftlich präzise. Nenne konkrete Werte (Temperatur, Luftfeuchtigkeit, Lux), konkrete Materialien und Methoden. Wenn etwas unklar ist, frage nach zusätzlichen Informationen oder Bildern.
-
-Antworte auf Deutsch.`;
+Antworte auf Deutsch in einem strukturierten, gut lesbaren Format.`;
         }
 
         function newAnalysis() {
