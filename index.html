@@ -487,7 +487,7 @@
 
 <body>
     <div class="container">
-        <h1>🏛️ Konservieren <span style="font-size: 14px; font-weight: 400; color: var(--museum-gold);">v2.0</span>
+        <h1>🏛️ Konservieren <span style="font-size: 14px; font-weight: 400; color: var(--museum-gold);">v2.1</span>
         </h1>
         <div class="subtitle">Artefakt-Analyse für Museum & Archiv</div>
 
@@ -536,9 +536,22 @@
         <div id="uploadSection" class="upload-section hidden">
             <h3>📸 Artefakt dokumentieren (bis zu 4 Bilder)</h3>
             <p style="color: #6c757d; font-size: 14px; margin-bottom: 15px;">
-                Füge mehrere Bilder hinzu (Gesamtansicht, Details, Schäden, etc.) und beschreibe jedes Bild mit
-                Kontext-Informationen.
+                Lade alle Bilder auf einmal hoch oder füge sie einzeln hinzu. Für jedes Bild kannst du
+                Kontext-Informationen angeben.
             </p>
+
+            <!-- Central Multi-Upload Button -->
+            <div style="text-align: center; margin-bottom: 30px;">
+                <input type="file" id="multiImageInput" accept="image/*" multiple style="display: none;"
+                    onchange="handleMultiImageUpload(event)">
+                <button class="btn btn-primary" onclick="document.getElementById('multiImageInput').click()"
+                    style="padding: 16px 40px; font-size: 14px;">
+                    📷 Alle Bilder auswählen (bis zu 4)
+                </button>
+                <p style="color: #6c757d; font-size: 12px; margin-top: 10px;">
+                    💡 Oder füge Bilder einzeln über die Slots hinzu
+                </p>
+            </div>
 
             <div class="images-grid" id="imagesGrid">
                 <div class="image-slot" id="slot1">
@@ -747,6 +760,77 @@
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
+        }
+
+        function handleMultiImageUpload(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            // Max 4 images
+            const maxImages = 4;
+            const filesToProcess = Array.from(files).slice(0, maxImages);
+
+            // Process each file and assign to next available slot
+            filesToProcess.forEach((file, index) => {
+                // Find next empty slot
+                let slotNumber = index + 1;
+
+                // If slot already has image, find next empty one
+                while (slotNumber <= 4 && images[slotNumber - 1] !== null) {
+                    slotNumber++;
+                }
+
+                if (slotNumber > 4) return; // No more slots available
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = new Image();
+                    img.onload = function () {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        // Maximale Größe: 1600px
+                        const maxSize = 1600;
+                        if (width > maxSize || height > maxSize) {
+                            if (width > height) {
+                                height = (height / width) * maxSize;
+                                width = maxSize;
+                            } else {
+                                width = (width / height) * maxSize;
+                                height = maxSize;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        images[slotNumber - 1] = canvas.toDataURL('image/jpeg', 0.8);
+
+                        // Vorschau anzeigen
+                        const previewContainer = document.getElementById('preview' + slotNumber);
+                        previewContainer.innerHTML = `
+                            <img src="${images[slotNumber - 1]}" class="image-preview-small">
+                            <button class="remove-image" onclick="removeImage(${slotNumber})">×</button>
+                        `;
+
+                        // Kontext-Textfeld anzeigen
+                        document.getElementById('context' + slotNumber).style.display = 'block';
+                        document.getElementById('slot' + slotNumber).classList.add('has-image');
+
+                        // Analyse-Button aktivieren
+                        updateAnalyzeButton();
+                        hideError();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // Clear the input so the same files can be selected again if needed
+            event.target.value = '';
         }
 
         function removeImage(slotNumber) {
