@@ -566,34 +566,14 @@
         let contextTexts = ['', '', '', ''];
         let selectedUsage = null;
         let currentAnalysis = null;
-        let apiKey = null;
+        let apiKey = 'AIzaSyAtE1Nsu609m2KuCGXP8whnNZWB_sUugcE';
 
-        // API Key aus localStorage laden
+        // App direkt starten
         window.onload = function() {
-            localStorage.removeItem('anthropicApiKey');
-            const savedKey = localStorage.getItem('geminiApiKey');
-            if (savedKey) {
-                apiKey = savedKey;
-                document.getElementById('apiKeySection').classList.add('hidden');
-                document.getElementById('usageSection').classList.remove('hidden');
-            }
-        };
-
-        function saveApiKey() {
-            const input = document.getElementById('apiKeyInput');
-            const key = input.value.trim();
-
-            if (!key.startsWith('AIza')) {
-                showError('Bitte gib einen gültigen Google Gemini API Key ein (beginnt mit AIza)');
-                return;
-            }
-
-            apiKey = key;
-            localStorage.setItem('geminiApiKey', key);
             document.getElementById('apiKeySection').classList.add('hidden');
             document.getElementById('usageSection').classList.remove('hidden');
-            hideError();
-        }
+        };
+
 
         function selectUsage(usage) {
             selectedUsage = usage;
