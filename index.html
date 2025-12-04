@@ -1,19 +1,24 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Konservieren - Artefakt Analyse</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
 
     <style>
         :root {
-            --museum-gold: #C5A059;
-            --museum-charcoal: #1C1B1A;
-            --museum-paper: #F9F8F6;
-            --museum-stone: #E6E2D3;
+            --museum-gold: #d97706;
+            --museum-charcoal: #1f2937;
+            --museum-paper: #fef3c7;
+            --museum-stone: #e5e7eb;
+            --gold-gradient-start: #b45309;
+            --gold-gradient-end: #d97706;
         }
 
         * {
@@ -46,9 +51,13 @@
             color: var(--museum-charcoal);
             text-align: center;
             margin-bottom: 10px;
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 700;
             letter-spacing: 0.05em;
+            background: linear-gradient(135deg, var(--gold-gradient-start), var(--gold-gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .subtitle {
@@ -129,15 +138,17 @@
         }
 
         .btn-primary {
-            background: var(--museum-charcoal);
+            background: linear-gradient(135deg, var(--gold-gradient-start), var(--gold-gradient-end));
             color: white;
-            border-color: transparent;
+            border: none;
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .btn-primary:hover {
-            background: #2c2c2c;
-            border-color: var(--museum-gold);
-            box-shadow: 0 4px 12px rgba(197, 160, 89, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(217, 119, 6, 0.4);
+            background: linear-gradient(135deg, #a3470a, #f59e0b);
         }
 
         .btn-secondary {
@@ -177,24 +188,26 @@
 
         .usage-option {
             padding: 20px;
-            border: 1px solid var(--museum-stone);
-            border-radius: 2px;
+            border: 2px solid var(--museum-stone);
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
             background: white;
         }
 
         .usage-option:hover {
             border-color: var(--museum-gold);
-            background: rgba(197, 160, 89, 0.05);
-            box-shadow: 0 4px 12px rgba(197, 160, 89, 0.1);
+            background: rgba(217, 119, 6, 0.05);
+            box-shadow: 0 8px 20px rgba(217, 119, 6, 0.15);
+            transform: translateY(-4px);
         }
 
         .usage-option.selected {
             border-color: var(--museum-gold);
-            background: rgba(197, 160, 89, 0.1);
+            background: linear-gradient(135deg, rgba(217, 119, 6, 0.1), rgba(217, 119, 6, 0.05));
             border-width: 2px;
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2);
         }
 
         .upload-section {
@@ -234,7 +247,7 @@
             border-style: solid;
             border-color: var(--museum-gold);
             background: white;
-            box-shadow: 0 2px 8px rgba(197, 160, 89, 0.1);
+            box-shadow: 0 4px 16px rgba(217, 119, 6, 0.2);
         }
 
         .image-preview-container {
@@ -317,21 +330,23 @@
 
         .analyze-btn {
             width: 100%;
-            background: var(--museum-charcoal);
+            background: linear-gradient(135deg, var(--gold-gradient-start), var(--gold-gradient-end));
             color: white;
-            padding: 18px;
-            font-size: 13px;
+            padding: 20px;
+            font-size: 14px;
             min-height: auto;
             border: none;
             font-weight: 700;
             letter-spacing: 0.15em;
             text-transform: uppercase;
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .analyze-btn:hover {
-            background: #2c2c2c;
-            border-color: var(--museum-gold);
-            box-shadow: 0 6px 16px rgba(197, 160, 89, 0.3);
+        .analyze-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(217, 119, 6, 0.4);
+            background: linear-gradient(135deg, #a3470a, #f59e0b);
         }
 
         .analyze-btn:disabled {
@@ -350,16 +365,17 @@
         }
 
         .result-box {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            border: 2px solid #e9ecef;
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            border: 2px solid var(--museum-stone);
             margin-bottom: 20px;
             white-space: pre-wrap;
             line-height: 1.8;
-            color: #333;
+            color: var(--museum-charcoal);
             max-height: 600px;
             overflow-y: auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .action-buttons {
@@ -397,8 +413,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .error {
@@ -463,9 +484,11 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <h1>🏛️ Konservieren <span style="font-size: 14px; font-weight: 400; color: var(--museum-gold);">v1.5</span></h1>
+        <h1>🏛️ Konservieren <span style="font-size: 14px; font-weight: 400; color: var(--museum-gold);">v2.0</span>
+        </h1>
         <div class="subtitle">Artefakt-Analyse für Museum & Archiv</div>
 
         <!-- API Key Eingabe -->
@@ -473,7 +496,8 @@
             <h3>🔑 Google Gemini API Key eingeben</h3>
             <p>
                 Du benötigst einen Google Gemini API Key (kostenlos!).<br>
-                Hole dir deinen Key auf <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>.<br>
+                Hole dir deinen Key auf <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI
+                    Studio</a>.<br>
                 Kostenlos: 15 Anfragen pro Minute, 1500 pro Tag.
             </p>
             <div class="api-input-group">
@@ -512,7 +536,8 @@
         <div id="uploadSection" class="upload-section hidden">
             <h3>📸 Artefakt dokumentieren (bis zu 4 Bilder)</h3>
             <p style="color: #6c757d; font-size: 14px; margin-bottom: 15px;">
-                Füge mehrere Bilder hinzu (Gesamtansicht, Details, Schäden, etc.) und beschreibe jedes Bild mit Kontext-Informationen.
+                Füge mehrere Bilder hinzu (Gesamtansicht, Details, Schäden, etc.) und beschreibe jedes Bild mit
+                Kontext-Informationen.
             </p>
 
             <div class="images-grid" id="imagesGrid">
@@ -522,11 +547,13 @@
                         <label for="imageInput1" class="btn btn-primary upload-btn-small">
                             📷 Bild 1 hinzufügen
                         </label>
-                        <input type="file" id="imageInput1" accept="image/*" capture="environment" onchange="handleImageUpload(1, event)">
+                        <input type="file" id="imageInput1" accept="image/*" capture="environment"
+                            onchange="handleImageUpload(1, event)">
                     </div>
                     <div class="image-context" id="context1" style="display: none;">
                         <label>Kontext-Information zu Bild 1:</label>
-                        <textarea id="contextText1" placeholder="z.B. Gesamtansicht, lagert seit 10 Jahren bei 60% Luftfeuchtigkeit, Temperatur 18°C..."></textarea>
+                        <textarea id="contextText1"
+                            placeholder="z.B. Gesamtansicht, lagert seit 10 Jahren bei 60% Luftfeuchtigkeit, Temperatur 18°C..."></textarea>
                     </div>
                 </div>
 
@@ -536,11 +563,13 @@
                         <label for="imageInput2" class="btn btn-primary upload-btn-small">
                             📷 Bild 2 hinzufügen
                         </label>
-                        <input type="file" id="imageInput2" accept="image/*" capture="environment" onchange="handleImageUpload(2, event)">
+                        <input type="file" id="imageInput2" accept="image/*" capture="environment"
+                            onchange="handleImageUpload(2, event)">
                     </div>
                     <div class="image-context" id="context2" style="display: none;">
                         <label>Kontext-Information zu Bild 2:</label>
-                        <textarea id="contextText2" placeholder="z.B. Detailaufnahme eines Schadens, Verfärbung, Riss..."></textarea>
+                        <textarea id="contextText2"
+                            placeholder="z.B. Detailaufnahme eines Schadens, Verfärbung, Riss..."></textarea>
                     </div>
                 </div>
 
@@ -550,11 +579,13 @@
                         <label for="imageInput3" class="btn btn-primary upload-btn-small">
                             📷 Bild 3 hinzufügen
                         </label>
-                        <input type="file" id="imageInput3" accept="image/*" capture="environment" onchange="handleImageUpload(3, event)">
+                        <input type="file" id="imageInput3" accept="image/*" capture="environment"
+                            onchange="handleImageUpload(3, event)">
                     </div>
                     <div class="image-context" id="context3" style="display: none;">
                         <label>Kontext-Information zu Bild 3:</label>
-                        <textarea id="contextText3" placeholder="z.B. Rückseite, Unterseite, Materialdetails..."></textarea>
+                        <textarea id="contextText3"
+                            placeholder="z.B. Rückseite, Unterseite, Materialdetails..."></textarea>
                     </div>
                 </div>
 
@@ -564,16 +595,19 @@
                         <label for="imageInput4" class="btn btn-primary upload-btn-small">
                             📷 Bild 4 hinzufügen
                         </label>
-                        <input type="file" id="imageInput4" accept="image/*" capture="environment" onchange="handleImageUpload(4, event)">
+                        <input type="file" id="imageInput4" accept="image/*" capture="environment"
+                            onchange="handleImageUpload(4, event)">
                     </div>
                     <div class="image-context" id="context4" style="display: none;">
                         <label>Kontext-Information zu Bild 4:</label>
-                        <textarea id="contextText4" placeholder="z.B. Nahaufnahme von Materialstruktur, Beschriftung..."></textarea>
+                        <textarea id="contextText4"
+                            placeholder="z.B. Nahaufnahme von Materialstruktur, Beschriftung..."></textarea>
                     </div>
                 </div>
             </div>
 
-            <button class="btn analyze-btn" id="analyzeBtn" onclick="analyzeArtifact()" disabled>🔍 Konservierungsanalyse starten</button>
+            <button class="btn analyze-btn" id="analyzeBtn" onclick="analyzeArtifact()" disabled>🔍
+                Konservierungsanalyse starten</button>
         </div>
 
         <!-- Lade-Animation -->
@@ -595,7 +629,8 @@
 
         <!-- Footer -->
         <div class="footer">
-            Powered by <strong><a href="https://heimatverein-vorchdorf.at" target="_blank">Heimatverein Vorchdorf</a></strong>
+            Powered by <strong><a href="https://heimatverein-vorchdorf.at" target="_blank">Heimatverein
+                    Vorchdorf</a></strong>
         </div>
     </div>
 
@@ -607,13 +642,45 @@
         let contextTexts = ['', '', '', ''];
         let selectedUsage = null;
         let currentAnalysis = null;
-        let apiKey = 'AIzaSyAtE1Nsu609m2KuCGXP8whnNZWB_sUugcE';
+        let apiKey = '';
 
-        // App direkt starten
-        window.onload = function() {
+        // Check for stored API key on load
+        window.onload = function () {
+            const storedKey = localStorage.getItem('geminiApiKey');
+            if (storedKey && storedKey.trim().length > 0) {
+                apiKey = storedKey;
+                document.getElementById('apiKeySection').classList.add('hidden');
+                document.getElementById('usageSection').classList.remove('hidden');
+            } else {
+                // Show API key input
+                document.getElementById('apiKeySection').classList.remove('hidden');
+                document.getElementById('usageSection').classList.add('hidden');
+            }
+        };
+
+        function saveApiKey() {
+            const input = document.getElementById('apiKeyInput');
+            const key = input.value.trim();
+
+            if (!key || key.length < 20) {
+                showError('Bitte gib einen gültigen API-Key ein (mindestens 20 Zeichen).');
+                return;
+            }
+
+            if (!key.startsWith('AIzaSy')) {
+                showError('Der API-Key sollte mit "AIzaSy" beginnen. Bitte überprüfe deinen Key.');
+                return;
+            }
+
+            // Save to localStorage
+            localStorage.setItem('geminiApiKey', key);
+            apiKey = key;
+
+            // Hide API section, show usage section
             document.getElementById('apiKeySection').classList.add('hidden');
             document.getElementById('usageSection').classList.remove('hidden');
-        };
+            hideError();
+        }
 
 
         function selectUsage(usage) {
@@ -636,9 +703,9 @@
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const img = new Image();
-                img.onload = function() {
+                img.onload = function () {
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
@@ -1063,4 +1130,5 @@ Antworte auf Deutsch.`;
         }
     </script>
 </body>
+
 </html>
