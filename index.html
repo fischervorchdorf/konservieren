@@ -925,7 +925,7 @@
                 <div class="header-icon">🏛️</div>
                 <div>
                     <div class="header-title">KONSERVIEREN <span
-                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.19</span></div>
+                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.20</span></div>
                     <div class="header-subtitle">Artefakt-Analyse für Museum & Archiv</div>
                 </div>
             </div>
@@ -1397,6 +1397,7 @@
             let overall = 'MITTEL';
             let justification = '';
             let dating = 'Unbekannt';
+            let title = 'Unbekanntes Objekt';
 
             if (priorityMatch) {
                 const pText = priorityMatch[1];
@@ -1407,6 +1408,7 @@
                 overall = pText.match(/GESAMT:\s*([A-Z]+)/i)?.[1] || 'MITTEL';
                 justification = pText.match(/BEGRÜNDUNG:\s*(.+)/i)?.[1]?.trim() || '';
                 dating = pText.match(/DATIERUNG:\s*(.+)/i)?.[1]?.trim() || 'Unbekannt';
+                title = pText.match(/TITEL:\s*(.+)/i)?.[1]?.trim() || 'Unbekanntes Objekt';
             }
 
             const overallClass = overall.toLowerCase().replace(/ü/g, 'u');
@@ -1470,8 +1472,11 @@
                         <div class="priority-badge ${overallClass}">
                             ${badgeIcon}
                         </div>
-                        <div style="margin-top: 10px; font-weight: bold; color: #666;">
-                            🕒 ${dating}
+                        <div style="margin-top: 10px; text-align: center;">
+                            <div style="font-size: 1.2em; font-weight: bold; color: #333; margin-bottom: 4px;">${title}</div>
+                            <div style="font-weight: bold; color: #666;">
+                                🕒 ${dating}
+                            </div>
                         </div>
                     </div>
                     <div class="priority-gauges">
@@ -1574,6 +1579,7 @@ FORMATIERUNG (STRENG EINHALTEN):
 Nutze exakt diese Trenner. Keine Markdown-Formatierung (kein Fett/Kursiv) innerhalb der Datenfelder.
 
 ###SECTION_START: PRIORITY###
+TITEL: [Kurzer, prägnanter Name des Objekts, z.B. "Herren-Armbanduhr Omega, 1950er"]
 DATIERUNG: [Geschätzter Zeitraum, z.B. "ca. 1950er Jahre"]
 DRINGLICHKEIT: [Zahl 1-10]
 SELTENHEIT: [Zahl 1-10]
@@ -1648,8 +1654,13 @@ WICHTIG:
 
             const timestamp = new Date().toLocaleString('de-AT');
 
+            // Extract Title
+            const priorityMatch = currentAnalysis.match(/###SECTION_START: PRIORITY###([\s\S]*?)###SECTION_END: PRIORITY###/);
+            const title = priorityMatch ? (priorityMatch[1].match(/TITEL:\s*(.+)/i)?.[1]?.trim() || 'Unbekanntes Objekt') : 'Unbekanntes Objekt';
+
             let content = `KONSERVIERUNGS-ANALYSE\n`;
             content += `${'='.repeat(60)}\n`;
+            content += `Objekt: ${title}\n`;
             content += `Zeitpunkt: ${timestamp}\n`;
             content += `${'='.repeat(60)}\n\n`;
 
@@ -1737,6 +1748,16 @@ WICHTIG:
             pdf.setTextColor(100, 100, 100);
             const timestamp = new Date().toLocaleString('de-AT');
             pdf.text(`Zeitpunkt: ${timestamp}`, margin, yPosition);
+            yPosition += 6;
+
+            // Extract Title
+            const priorityMatch = currentAnalysis.match(/###SECTION_START: PRIORITY###([\s\S]*?)###SECTION_END: PRIORITY###/);
+            const title = priorityMatch ? (priorityMatch[1].match(/TITEL:\s*(.+)/i)?.[1]?.trim() || 'Unbekanntes Objekt') : 'Unbekanntes Objekt';
+
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.setTextColor(0, 0, 0);
+            pdf.text(title, margin, yPosition);
             yPosition += 15;
 
             // --- BILDER ---
