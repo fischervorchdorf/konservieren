@@ -658,6 +658,140 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Priority Banner Styles */
+        .priority-banner {
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 5px solid;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .priority-banner.kritisch {
+            border-left-color: #dc2626;
+            background: linear-gradient(to right, #fef2f2, white);
+        }
+
+        .priority-banner.hoch {
+            border-left-color: #ea580c;
+            background: linear-gradient(to right, #fff7ed, white);
+        }
+
+        .priority-banner.mittel {
+            border-left-color: #ca8a04;
+            background: linear-gradient(to right, #fefce8, white);
+        }
+
+        .priority-banner.stabil {
+            border-left-color: #16a34a;
+            background: linear-gradient(to right, #f0fdf4, white);
+        }
+
+        .priority-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--museum-charcoal);
+        }
+
+        .priority-scores {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 11px;
+            color: #6b7280;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .score-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--museum-gold);
+        }
+
+        .priority-justification {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Result Section Cards */
+        .result-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 2px solid var(--museum-stone);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .result-card h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--museum-charcoal);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-card h3 .icon {
+            font-size: 24px;
+        }
+
+        .result-card-content {
+            line-height: 1.8;
+            color: var(--museum-charcoal);
+        }
+
+        .result-card-content p {
+            margin-bottom: 12px;
+        }
+
+        .result-card-content strong {
+            color: var(--museum-gold);
+        }
+
+        .sources-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sources-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--museum-stone);
+        }
+
+        .sources-list li:last-child {
+            border-bottom: none;
+        }
+
+        .sources-list a {
+            color: var(--museum-gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .sources-list a:hover {
+            color: var(--museum-charcoal);
+            text-decoration: underline;
+        }
     </style>
 </head>
 
@@ -669,7 +803,7 @@
                 <div class="header-icon">🏛️</div>
                 <div>
                     <div class="header-title">KONSERVIEREN <span
-                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.6</span></div>
+                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.7</span></div>
                     <div class="header-subtitle">Artefakt-Analyse für Museum & Archiv</div>
                 </div>
             </div>
@@ -746,7 +880,8 @@
                 </div>
                 <h2 class="upload-title">Artefakt hochladen</h2>
                 <p class="upload-description">
-                    Lade 1-4 Bilder deines Artefakts hoch oder mache ein Foto. Mehrere Perspektiven helfen bei der
+                    Lade 1-6 Bilder deines Artefakts hoch oder mache ein Foto. Mehrere Perspektiven und Details helfen
+                    bei der
                     Analyse.
                 </p>
 
@@ -838,6 +973,38 @@
                             placeholder="z.B. Nahaufnahme von Materialstruktur, Beschriftung..."></textarea>
                     </div>
                 </div>
+
+                <div class="image-slot" id="slot5">
+                    <div class="image-preview-container" id="preview5"></div>
+                    <div class="upload-btn">
+                        <label for="imageInput5" class="btn btn-primary upload-btn-small">
+                            📷 Bild 5 hinzufügen
+                        </label>
+                        <input type="file" id="imageInput5" accept="image/*" capture="environment"
+                            onchange="handleImageUpload(5, event)">
+                    </div>
+                    <div class="image-context" id="context5" style="display: none;">
+                        <label>Kontext-Information zu Bild 5:</label>
+                        <textarea id="contextText5"
+                            placeholder="z.B. Weitere Detailaufnahme, Markierungen, Stempel..."></textarea>
+                    </div>
+                </div>
+
+                <div class="image-slot" id="slot6">
+                    <div class="image-preview-container" id="preview6"></div>
+                    <div class="upload-btn">
+                        <label for="imageInput6" class="btn btn-primary upload-btn-small">
+                            📷 Bild 6 hinzufügen
+                        </label>
+                        <input type="file" id="imageInput6" accept="image/*" capture="environment"
+                            onchange="handleImageUpload(6, event)">
+                    </div>
+                    <div class="image-context" id="context6" style="display: none;">
+                        <label>Kontext-Information zu Bild 6:</label>
+                        <textarea id="contextText6"
+                            placeholder="z.B. Gesamtübersicht, weitere Perspektive..."></textarea>
+                    </div>
+                </div>
             </div>
 
             <button class="btn analyze-btn" id="analyzeBtn" onclick="analyzeArtifact()" disabled>🔍
@@ -872,8 +1039,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <script>
-        let images = [null, null, null, null];
-        let contextTexts = ['', '', '', ''];
+        let images = [null, null, null, null, null, null];
+        let contextTexts = ['', '', '', '', '', ''];
         let selectedUsage = null;
         let currentAnalysis = null;
         let apiKey = 'AIzaSyBudkecvmZX9cRyXRaPw16Fct2MbGDBQog'; // Shared domain-restricted key (fischervorchdorf.github.io/*)
@@ -963,8 +1130,8 @@
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
-            // Max 4 images
-            const maxImages = 4;
+            // Max 6 images
+            const maxImages = 6;
             const filesToProcess = Array.from(files).slice(0, maxImages);
 
             // Process each file and assign to next available slot
@@ -973,11 +1140,11 @@
                 let slotNumber = index + 1;
 
                 // If slot already has image, find next empty one
-                while (slotNumber <= 4 && images[slotNumber - 1] !== null) {
+                while (slotNumber <= 6 && images[slotNumber - 1] !== null) {
                     slotNumber++;
                 }
 
-                if (slotNumber > 4) return; // No more slots available
+                if (slotNumber > 6) return; // No more slots available
 
                 const reader = new FileReader();
                 reader.onload = function (e) {
@@ -1050,7 +1217,7 @@
 
         async function analyzeArtifact() {
             // Kontext-Texte sammeln
-            for (let i = 0; i < 4; i++) {
+            for (let i = 0; i < 6; i++) {
                 const textarea = document.getElementById('contextText' + (i + 1));
                 if (textarea) {
                     contextTexts[i] = textarea.value.trim();
@@ -1113,7 +1280,7 @@
 
                 // Ergebnis anzeigen
                 document.getElementById('loadingSection').classList.add('hidden');
-                document.getElementById('resultBox').textContent = currentAnalysis;
+                document.getElementById('resultBox').innerHTML = formatAnalysisResult(currentAnalysis);
                 document.getElementById('resultSection').classList.remove('hidden');
 
             } catch (error) {
@@ -1135,6 +1302,102 @@
             }
         }
 
+        function formatAnalysisResult(text) {
+            // Parse the text and structure it into HTML
+            let html = '';
+
+            // Extract priority section (0. KONSERVIERUNGS-PRIORITÄT)
+            const priorityMatch = text.match(/0\.\s*KONSERVIERUNGS-PRIORITÄT.*?(?=\n\n\d+\.|$)/s);
+            if (priorityMatch) {
+                const priorityText = priorityMatch[0];
+
+                // Extract scores
+                const urgency = priorityText.match(/Dringlichkeit.*?(\d+)/)?.[1] || '?';
+                const rarity = priorityText.match(/Seltenheit.*?(\d+)/)?.[1] || '?';
+                const historicalValue = priorityText.match(/Historischer Wert.*?(\d+)/)?.[1] || '?';
+                const condition = priorityText.match(/Erhaltungszustand.*?(\d+)/)?.[1] || '?';
+                const overall = priorityText.match(/Gesamtbewertung:\s*"?([^"\n]+)"?/)?.[1] || 'MITTEL';
+                const justification = priorityText.match(/Begründung:\s*(.+)/s)?.[1]?.trim() || '';
+
+                const overallClass = overall.toLowerCase().replace(/ü/g, 'u');
+
+                html += `
+                    <div class="priority-banner ${overallClass}">
+                        <div class="priority-title">🎯 Konservierungs-Priorität: ${overall.toUpperCase()}</div>
+                        <div class="priority-scores">
+                            <div class="score-item">
+                                <div class="score-label">Dringlichkeit</div>
+                                <div class="score-value">${urgency}/10</div>
+                            </div>
+                            <div class="score-item">
+                                <div class="score-label">Seltenheit</div>
+                                <div class="score-value">${rarity}/10</div>
+                            </div>
+                            <div class="score-item">
+                                <div class="score-label">Hist. Wert</div>
+                                <div class="score-value">${historicalValue}/10</div>
+                            </div>
+                            <div class="score-item">
+                                <div class="score-label">Zustand</div>
+                                <div class="score-value">${condition}/10</div>
+                            </div>
+                        </div>
+                        ${justification ? `<div class="priority-justification">${justification}</div>` : ''}
+                    </div>
+                `;
+            }
+
+            // Define sections with icons
+            const sections = [
+                { number: 1, title: 'Material-Identifikation', icon: '🔬' },
+                { number: 2, title: 'Zustandsanalyse', icon: '📋' },
+                { number: 3, title: 'Risikobewertung', icon: '⚠️' },
+                { number: 4, title: 'Konservierungskonzept', icon: '🛡️' },
+                { number: 5, title: 'Quellen & Literatur', icon: '📚' }
+            ];
+
+            sections.forEach(section => {
+                const regex = new RegExp(`${section.number}\\.\\s*[^\\n]+\\n([\\s\\S]*?)(?=\\n\\n\\d+\\.|$)`, 'i');
+                const match = text.match(regex);
+
+                if (match) {
+                    let content = match[0].replace(/^\d+\.\s*[^\n]+\n/, '').trim();
+
+                    // Clean up asterisks and format lists
+                    content = content.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+                    content = content.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
+                    content = content.replace(/^[\s-]*-\s+(.+)$/gm, '<li>$1</li>');
+                    content = content.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+                    content = content.replace(/\n\n/g, '</p><p>');
+                    content = '<p>' + content + '</p>';
+
+                    // Special handling for sources (section 5)
+                    if (section.number === 5) {
+                        const urlRegex = /(https?:\/\/[^\s<]+)/g;
+                        content = content.replace(urlRegex, '<a href="$1" target="_blank">$1</a>');
+                    }
+
+                    html += `
+                        <div class="result-card">
+                            <h3><span class="icon">${section.icon}</span> ${section.title}</h3>
+                            <div class="result-card-content">${content}</div>
+                        </div>
+                    `;
+                }
+            });
+
+            // Fallback: if no sections found, show original text
+            if (!html) {
+                // Clean and format the original text
+                let fallbackHtml = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+                fallbackHtml = fallbackHtml.replace(/\n\n/g, '</p><p>');
+                fallbackHtml = '<p>' + fallbackHtml + '</p>';
+                html = `<div class="result-card"><div class="result-card-content">${fallbackHtml}</div></div>`;
+            }
+
+            return html;
+        }
+
         function buildConservationPrompt() {
             const usageTexts = {
                 'exhibition': 'Dauerausstellung (Artefakt wird dauerhaft ausgestellt und ist Licht, Besuchern und Umwelteinflüssen ausgesetzt)',
@@ -1145,13 +1408,27 @@
 
             const usage = selectedUsage ? usageTexts[selectedUsage] : 'Nicht angegeben';
 
+            // Current date in German format
+            const today = new Date().toLocaleDateString('de-AT', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+
             return `Du bist ein wissenschaftlicher Experte für Konservierung und Restaurierung von Museumsobjekten (Conservator-Restorer).
 Analysiere das/die hochgeladene(n) Bild(er) eines Artefakts streng wissenschaftlich und detailliert.
 Deine Aussagen müssen valide, fachlich korrekt und überprüfbar sein.
 
+HEUTIGES DATUM: ${today}
 VERWENDUNGSZWECK: ${usage}
 
 Bitte erstelle ein professionelles Konservierungsgutachten mit folgenden Punkten:
+
+0. KONSERVIERUNGS-PRIORITÄT (ZUERST BEWERTEN!):
+   - Dringlichkeit (1-10): Wie schnell muss gehandelt werden? (10=SOFORT, 1=keine Eile)
+   - Seltenheit (1-10): Wie selten ist dieses Artefakt? (10=extrem selten, 1=häufig)
+   - Historischer Wert (1-10): Kulturelle/wissenschaftliche Bedeutung (10=unersetzlich, 1=gering)
+   - Erhaltungszustand (1-10): Aktueller Zustand (10=perfekt, 1=kritisch)
+   - Gesamtbewertung: "KRITISCH" | "HOCH" | "MITTEL" | "STABIL"
+   - Begründung: 2-3 Sätze warum dieser Konservierungsaufwand gerechtfertigt ist
 
 1. WISSENSCHAFTLICHE MATERIAL-IDENTIFIKATION:
    - Präzise Bestimmung der Materialien (z.B. nicht nur "Holz", sondern "Nadelholz, vermutlich Fichte/Tanne" wenn erkennbar)
@@ -1184,19 +1461,20 @@ WICHTIG:
 - Unterscheide klar zwischen Fakten (sichtbar) und Vermutungen.
 - Verwende die korrekte Fachterminologie.
 - Gib am Ende IMMER eine Liste der verwendeten Quellen und Links an.
+- Verwende das heutige Datum (${today}) wenn du ein Begutachtungsdatum angibst.
 
 Antworte auf Deutsch in einem strukturierten, gut lesbaren Format.`;
         }
 
         function newAnalysis() {
             // Reset
-            images = [null, null, null, null];
-            contextTexts = ['', '', '', ''];
+            images = [null, null, null, null, null, null];
+            contextTexts = ['', '', '', '', '', ''];
             selectedUsage = null;
             currentAnalysis = null;
 
             // UI Reset
-            for (let i = 1; i <= 4; i++) {
+            for (let i = 1; i <= 6; i++) {
                 document.getElementById('preview' + i).innerHTML = '';
                 document.getElementById('context' + i).style.display = 'none';
                 document.getElementById('contextText' + i).value = '';
@@ -1233,7 +1511,7 @@ Antworte auf Deutsch in einem strukturierten, gut lesbaren Format.`;
 
             // Kontext-Informationen
             let hasContext = false;
-            for (let i = 0; i < 4; i++) {
+            for (let i = 0; i < 6; i++) {
                 if (images[i] && contextTexts[i]) {
                     if (!hasContext) {
                         content += `KONTEXT-INFORMATIONEN:\n${'-'.repeat(70)}\n`;
