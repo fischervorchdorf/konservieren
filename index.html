@@ -925,7 +925,7 @@
                 <div class="header-icon">🏛️</div>
                 <div>
                     <div class="header-title">KONSERVIEREN <span
-                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.15</span></div>
+                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.16</span></div>
                     <div class="header-subtitle">Artefakt-Analyse für Museum & Archiv</div>
                 </div>
             </div>
@@ -1421,7 +1421,6 @@
                     errorMessage = 'Authentifizierungsfehler: Der API-Key ist ungültig.\n\nBitte überprüfe deinen Google Gemini API-Key.';
                 } else if (error.message.includes('429')) {
                     errorMessage = 'Zu viele Anfragen: Bitte warte einen Moment.';
-                } else if (error.message.includes('500') || error.message.includes('503')) {
                     errorMessage = 'Server-Fehler: Bitte versuche es später erneut.';
                 }
 
@@ -1432,203 +1431,146 @@
         function formatAnalysisResult(text) {
             let html = '';
 
-            // Extract priority section
-            const priorityMatch = text.match(/0\.\s*KONSERVIERUNGS-PRIORITÄT.*?(?=\n\n\d+\.|$)/s);
+            // --- 1. PARSE PRIORITY SECTION ---
+            const priorityMatch = text.match(/###SECTION_START: PRIORITY###([\s\S]*?)###SECTION_END: PRIORITY###/);
+
+            // Defaults
+            let urgency = 5, rarity = 5, historicalValue = 5, condition = 5;
+            let overall = 'MITTEL';
+            let justification = '';
+
             if (priorityMatch) {
-                const priorityText = priorityMatch[0];
-
-                // Extract scores
-                const urgency = parseInt(priorityText.match(/Dringlichkeit.*?(\d+)/)?.[1] || '5');
-                const rarity = parseInt(priorityText.match(/Seltenheit.*?(\d+)/)?.[1] || '5');
-                const historicalValue = parseInt(priorityText.match(/Historischer Wert.*?(\d+)/)?.[1] || '5');
-                const condition = parseInt(priorityText.match(/Erhaltungszustand.*?(\d+)/)?.[1] || '5');
-                const overallRaw = priorityText.match(/Gesamtbewertung:\s*"?([^"\n]+)"?/)?.[1]?.trim() || 'MITTEL';
-                const overall = overallRaw.replace(/\*/g, ''); // Remove asterisks
-                const justification = priorityText.match(/Begründung:\s*(.+)/s)?.[1]?.trim() || '';
-
-                const overallClass = overall.toLowerCase().replace(/ü/g, 'u');
-
-                // Metric-specific color functions
-                function getUrgencyColor(value) {
-                    // Low urgency = green (good), high urgency = red (critical)
-                    if (value <= 3) return '#16a34a'; // green - no rush
-                    if (value <= 6) return '#ca8a04'; // yellow - moderate
-                    if (value <= 8) return '#ea580c'; // orange - soon
-                    return '#dc2626'; // red - urgent!
-                }
-
-                function getRarityColor(value) {
-                    // Low rarity = gray (common), high rarity = gold (rare/valuable)
-                    if (value <= 3) return '#9ca3af'; // gray - common
-                    if (value <= 6) return '#78716c'; // brown - uncommon
-                    if (value <= 8) return '#ca8a04'; // gold - rare
-                    return '#d97706'; // bright gold - very rare!
-                }
-
-                function getValueColor(value) {
-                    // Low value = gray (low importance), high value = gold (precious)
-                    if (value <= 3) return '#9ca3af'; // gray - low value
-                    if (value <= 6) return '#78716c'; // brown - moderate value
-                    if (value <= 8) return '#ca8a04'; // gold - high value
-                    return '#d97706'; // bright gold - invaluable!
-                }
-
-                function getConditionColor(value) {
-                    // Low condition = red (bad state), high condition = green (good state)
-                    if (value <= 3) return '#dc2626'; // red - critical condition
-                    if (value <= 6) return '#ea580c'; // orange - fair condition
-                    if (value <= 8) return '#ca8a04'; // yellow - good condition
-                    return '#16a34a'; // green - excellent condition!
-                }
-
-                function getUrgencyLabel(value) {
-                    if (value <= 2) return '✅ Keine Eile';
-                    if (value <= 4) return '⏰ Zeit nehmen';
-                    if (value <= 7) return '⚠️ Bald handeln';
-                    return '🚨 SOFORT!';
-                }
-
-                function getRarityLabel(value) {
-                    if (value <= 2) return '⚪ Häufig';
-                    if (value <= 5) return '🔵 Ungewöhnlich';
-                    if (value <= 8) return '🟡 Selten';
-                    return '🟨 Sehr selten!';
-                }
-
-                function getValueLabel(value) {
-                    if (value <= 2) return '📄 Geringe Bedeutung';
-                    if (value <= 5) return '📌 Wichtig';
-                    if (value <= 8) return '💎 Sehr wertvoll';
-                    return '👑 Unersetzlich!';
-                }
-
-                function getConditionLabel(value) {
-                    if (value <= 2) return '💔 Kritisch';
-                    if (value <= 4) return '😟 Beschädigt';
-                    if (value <= 7) return '😊 Gut';
-                    return '✨ Exzellent!';
-                }
-                // Icon without stars
-                const badgeIcon = overall.includes('KRITISCH') ? '🚨' : overall.includes('HOCH') ? '⚡' : overall.includes('MITTEL') ? '⚠️' : '✅';
-
-                html += `
-                    <div class="priority-hero ${overallClass}">
-                        <div class="priority-header">
-                            <div class="priority-badge ${overallClass}">
-                                ${badgeIcon} <!-- Text removed as requested -->
-                            </div>
-                        </div>
-                        <div class="priority-gauges">
-                            <div class="gauge-container">
-                                <div class="gauge-label">Dringlichkeit</div>
-                                <div class="gauge-circle" style="--gauge-value: ${urgency * 10}; --gauge-color: ${getUrgencyColor(urgency)};">
-                                    <div class="gauge-inner">${urgency}</div>
-                                </div>
-                                <div class="gauge-description">${getUrgencyLabel(urgency)}</div>
-                            </div>
-                            <div class="gauge-container">
-                                <div class="gauge-label">Seltenheit</div>
-                                <div class="gauge-circle" style="--gauge-value: ${rarity * 10}; --gauge-color: ${getRarityColor(rarity)};">
-                                    <div class="gauge-inner">${rarity}</div>
-                                </div>
-                                <div class="gauge-description">${getRarityLabel(rarity)}</div>
-                            </div>
-                            <div class="gauge-container">
-                                <div class="gauge-label">Historischer Wert</div>
-                                <div class="gauge-circle" style="--gauge-value: ${historicalValue * 10}; --gauge-color: ${getValueColor(historicalValue)};">
-                                    <div class="gauge-inner">${historicalValue}</div>
-                                </div>
-                                <div class="gauge-description">${getValueLabel(historicalValue)}</div>
-                            </div>
-                            <div class="gauge-container">
-                                <div class="gauge-label">Erhaltungszustand</div>
-                                <div class="gauge-circle" style="--gauge-value: ${condition * 10}; --gauge-color: ${getConditionColor(condition)};">
-                                    <div class="gauge-inner">${condition}</div>
-                                </div>
-                                <div class="gauge-description">${getConditionLabel(condition)}</div>
-                            </div>
-                        </div>
-                        ${justification ? `<div class="priority-justification-box">💡 <strong>Warum wichtig:</strong> ${justification}</div>` : ''}
-                    </div>
-                `;
+                const pText = priorityMatch[1];
+                urgency = parseInt(pText.match(/DRINGLICHKEIT:\s*(\d+)/i)?.[1] || '5');
+                rarity = parseInt(pText.match(/SELTENHEIT:\s*(\d+)/i)?.[1] || '5');
+                historicalValue = parseInt(pText.match(/WERT:\s*(\d+)/i)?.[1] || '5');
+                condition = parseInt(pText.match(/ZUSTAND:\s*(\d+)/i)?.[1] || '5');
+                overall = pText.match(/GESAMT:\s*([A-Z]+)/i)?.[1] || 'MITTEL';
+                justification = pText.match(/BEGRÜNDUNG:\s*(.+)/i)?.[1]?.trim() || '';
             }
 
-            // Define sections with their color themes
-            // Note: Section numbers might be 5 or 6 for sources depending on whether usage-specific section exists
+            const overallClass = overall.toLowerCase().replace(/ü/g, 'u');
+
+            // Helper functions for colors and labels (reused)
+            function getUrgencyColor(value) {
+                if (value <= 3) return '#16a34a';
+                if (value <= 6) return '#ca8a04';
+                if (value <= 8) return '#ea580c';
+                return '#dc2626';
+            }
+            function getRarityColor(value) {
+                if (value <= 3) return '#9ca3af';
+                if (value <= 6) return '#78716c';
+                if (value <= 8) return '#ca8a04';
+                return '#d97706';
+            }
+            function getValueColor(value) {
+                if (value <= 3) return '#9ca3af';
+                if (value <= 6) return '#78716c';
+                if (value <= 8) return '#ca8a04';
+                return '#d97706';
+            }
+            function getConditionColor(value) {
+                if (value <= 3) return '#dc2626';
+                if (value <= 6) return '#ea580c';
+                if (value <= 8) return '#ca8a04';
+                return '#16a34a';
+            }
+
+            function getUrgencyLabel(value) {
+                if (value <= 2) return '✅ Keine Eile';
+                if (value <= 4) return '⏰ Zeit nehmen';
+                if (value <= 7) return '⚠️ Bald handeln';
+                return '🚨 SOFORT!';
+            }
+            function getRarityLabel(value) {
+                if (value <= 2) return '⚪ Häufig';
+                if (value <= 5) return '🔵 Ungewöhnlich';
+                if (value <= 8) return '🟡 Selten';
+                return '🟨 Sehr selten!';
+            }
+            function getValueLabel(value) {
+                if (value <= 2) return '📄 Geringe Bedeutung';
+                if (value <= 5) return '📌 Wichtig';
+                if (value <= 8) return '💎 Sehr wertvoll';
+                return '👑 Unersetzlich!';
+            }
+            function getConditionLabel(value) {
+                if (value <= 2) return '💔 Kritisch';
+                if (value <= 4) return '😟 Beschädigt';
+                if (value <= 7) return '😊 Gut';
+                return '✨ Exzellent!';
+            }
+
+            const badgeIcon = overall.includes('KRITISCH') ? '🚨' : overall.includes('HOCH') ? '⚡' : overall.includes('MITTEL') ? '⚠️' : '✅';
+
+            html += `
+                <div class="priority-hero ${overallClass}">
+                    <div class="priority-header">
+                        <div class="priority-badge ${overallClass}">
+                            ${badgeIcon}
+                        </div>
+                    </div>
+                    <div class="priority-gauges">
+                        <div class="gauge-container">
+                            <div class="gauge-label">Dringlichkeit</div>
+                            <div class="gauge-circle" style="--gauge-value: ${urgency * 10}; --gauge-color: ${getUrgencyColor(urgency)};">
+                                <div class="gauge-inner">${urgency}</div>
+                            </div>
+                            <div class="gauge-description">${getUrgencyLabel(urgency)}</div>
+                        </div>
+                        <div class="gauge-container">
+                            <div class="gauge-label">Seltenheit</div>
+                            <div class="gauge-circle" style="--gauge-value: ${rarity * 10}; --gauge-color: ${getRarityColor(rarity)};">
+                                <div class="gauge-inner">${rarity}</div>
+                            </div>
+                            <div class="gauge-description">${getRarityLabel(rarity)}</div>
+                        </div>
+                        <div class="gauge-container">
+                            <div class="gauge-label">Historischer Wert</div>
+                            <div class="gauge-circle" style="--gauge-value: ${historicalValue * 10}; --gauge-color: ${getValueColor(historicalValue)};">
+                                <div class="gauge-inner">${historicalValue}</div>
+                            </div>
+                            <div class="gauge-description">${getValueLabel(historicalValue)}</div>
+                        </div>
+                        <div class="gauge-container">
+                            <div class="gauge-label">Erhaltungszustand</div>
+                            <div class="gauge-circle" style="--gauge-value: ${condition * 10}; --gauge-color: ${getConditionColor(condition)};">
+                                <div class="gauge-inner">${condition}</div>
+                            </div>
+                            <div class="gauge-description">${getConditionLabel(condition)}</div>
+                        </div>
+                    </div>
+                    ${justification ? `<div class="priority-justification-box">💡 <strong>Warum wichtig:</strong> ${justification}</div>` : ''}
+                </div>
+            `;
+
+            // --- 2. PARSE CONTENT SECTIONS ---
             const sections = [
-                { number: 1, title: 'Material-Identifikation', icon: '🔬', theme: 'blue' },
-                { number: 2, title: 'Zustandsanalyse', icon: '📋', theme: 'purple' },
-                { number: 3, title: 'Risikobewertung', icon: '⚠️', theme: 'red' },
-                { number: 4, title: 'Konservierungskonzept', icon: '🛡️', theme: 'green' },
-                { number: 5, title: 'Spezielle Anforderungen', icon: '🎯', theme: 'orange' }, // Only for non-storage
-                { number: 6, title: 'Quellen & Literatur', icon: '📚', theme: 'amber' }  // Sources (section 6 if usage-specific exists)
+                { id: '1', title: 'Material-Identifikation', icon: '🔬', theme: 'blue' },
+                { id: '2', title: 'Zustandsanalyse', icon: '📋', theme: 'purple' },
+                { id: '3', title: 'Risikobewertung', icon: '⚠️', theme: 'red' },
+                { id: '4', title: 'Konservierungskonzept', icon: '🛡️', theme: 'green' },
+                { id: '5', title: 'Spezielle Anforderungen', icon: '🎯', theme: 'orange' },
+                { id: '6', title: 'Quellen & Literatur', icon: '📚', theme: 'amber' }
             ];
 
-            // Handle section 5 (sources) as fallback if section 6 doesn't exist
-            const hasSectionFive = text.match(/\n5\.\s*[^\n]+/);
-            const hasSectionSix = text.match(/\n6\.\s*[^\n]+/);
-
-
-            // Pre-process text to handle AI formatting quirks
-            // 1. Replace "---" with newlines
-            text = text.replace(/---/g, '\n\n');
-            // 2. Ensure numbered sections (e.g. "**1. Title**") are on their own lines
-            text = text.replace(/(\*\*|)\s*(\d+)\.\s+([^*]+)(\*\*|)/g, '\n$1$2. $3$4\n');
-            // 3. Clean up multiple newlines
-            text = text.replace(/\n{3,}/g, '\n\n');
-
             sections.forEach(section => {
-                // Regex to find section content: Look for "1. Title" ... content ... until next number "2." or end
-                // Added handling for potential ** around the number/title
-                const regex = new RegExp(`(?:\\*\\*|)\\s*${section.number}\\.\\s*[^\\n]+\\n([\\s\\S]*?)(?=\\n(?:\\*\\*|)\\s*\\d+\\.|$)`, 'i');
+                const regex = new RegExp(`###SECTION_START: ${section.id}###([\\s\\S]*?)###SECTION_END: ${section.id}###`);
                 const match = text.match(regex);
 
                 if (match) {
-                    let content = match[0].replace(/^\d+\.\s*[^\n]+\n/, '').trim();
+                    let content = match[1].trim();
 
-                    // Step 1: Convert markdown bold - multiple patterns
-                    content = content.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
-                    content = content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+                    // Clean up formatting
+                    content = content.replace(/\*\*/g, ''); // Remove all double asterisks
+                    content = content.replace(/\n\n+/g, '</p><p>'); // Paragraphs
+                    content = content.replace(/\n/g, '<br>'); // Line breaks
+                    content = `<p>${content}</p>`;
 
-                    // Step 2: Convert single * to bullets (at start of line or after newline)
-                    content = content.replace(/(^|\n)\s*\*\s+/g, '$1• ');
-
-                    // Step 3: Add breaks after colons followed by Capital letter (likely a new field)
-                    content = content.replace(/:\s*([A-ZÄÖÜ])/g, ':<br> $1');
-
-                    // Step 4: Handle values (add badge style)
-                    content = content.replace(/(\d+[-–]\d+\s*[°%]?\s*[CF%]?\w*)/g, '<span class="value-badge">$1</span>');
-                    content = content.replace(/(\d+\s*Lux)/g, '<span class="value-badge">$1</span>');
-
-                    // Step 5: Bullet lists
-                    const hasBullets = content.includes('\n- ') || content.includes('\n• ') || content.includes('• ');
-                    if (hasBullets) {
-                        // Replace bullets at line start
-                        content = content.replace(/^\s*[-•]\s+(.+)$/gm, '<li>$1</li>');
-                        // Wrap contiguous li elements in ul
-                        content = content.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>');
-                    }
-
-                    // Step 6: Line breaks for non-list content
-                    if (!content.includes('<ul>')) {
-                        // Single line breaks become <br>
-                        content = content.replace(/\n(?!\n)/g, '<br>\n');
-                        // Double line breaks become paragraph breaks
-                        content = content.replace(/\n\n+/g, '</p><p>');
-                        content = '<p>' + content + '</p>';
-                    } else {
-                        // Even with lists, we might have paragraphs outside
-                        content = content.replace(/\n\n+/g, '<br><br>');
-                    }
-
-                    // Special handling for sources section (can be 5 or 6)
-                    if (section.number === 5 || section.number === 6) {
-                        // Check if this section contains sources by looking for "QUELLEN" or "LITERATUR" in title
-                        const isSources = /quellen|literatur/i.test(content) || section.title.includes('Quellen');
-                        if (isSources) {
-                            const urlRegex = /(https?:\/\/[^\s<)]+)/g;
-                            content = content.replace(urlRegex, '<a href="$1" target="_blank">🔗 $1</a>');
-                        }
+                    // Linkify URLs in sources
+                    if (section.id === '6') {
+                        content = content.replace(/(https?:\/\/[^\s<)]+)/g, '<a href="$1" target="_blank">🔗 $1</a>');
                     }
 
                     html += `
@@ -1643,93 +1585,77 @@
                 }
             });
 
-            // Fallback if parsing failed
-            if (!html) {
-                let fallbackHtml = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-                fallbackHtml = fallbackHtml.replace(/\n\n/g, '</p><p>');
-                fallbackHtml = '<div class="section-block section-blue"><div class="section-body"><p>' + fallbackHtml + '</p></div></div>';
-                html = fallbackHtml;
-            }
-
             return html;
         }
 
         function buildConservationPrompt() {
             const usageTexts = {
-                'exhibition': 'Dauerausstellung (Artefakt wird dauerhaft ausgestellt und ist Licht, Besuchern und Umwelteinflüssen ausgesetzt)',
-                'temporary': 'Wechselausstellung (Temporäre Ausstellung mit Transport und wechselnden Bedingungen)',
-                'storage': 'Langzeitlagerung im Depot (Optimale Konservierung ohne Besucherverkehr)',
-                'transport': 'Transport (Artefakt muss sicher transportiert werden)'
+                'exhibition': 'Dauerausstellung (Artefakt wird dauerhaft ausgestellt)',
+                'temporary': 'Wechselausstellung (Temporäre Ausstellung)',
+                'storage': 'Langzeitlagerung im Depot (Optimale Konservierung)',
+                'transport': 'Transport (Sicherer Transport)'
             };
 
             const usage = selectedUsage ? usageTexts[selectedUsage] : 'Nicht angegeben';
+            const today = new Date().toLocaleDateString('de-AT', { year: 'numeric', month: 'long', day: 'numeric' });
 
-            // Current date in German format
-            const today = new Date().toLocaleDateString('de-AT', {
-                year: 'numeric', month: 'long', day: 'numeric'
-            });
+            return `ROLLE: Du bist ein konservativer, streng wissenschaftlicher Museumskurator und Restaurator mit 30 Jahren Erfahrung.
+AUFGABE: Erstelle ein professionelles Zustandsprotokoll (Condition Report) für das abgebildete Objekt.
+TONFALL: Sachlich, präzise, akademisch. Vermeide blumige Sprache. Faktenbasiert.
 
-            return `Du bist ein wissenschaftlicher Experte für Konservierung und Restaurierung von Museumsobjekten (Conservator-Restorer).
-Analysiere das/die hochgeladene(n) Bild(er) eines Artefakts streng wissenschaftlich und detailliert.
-Deine Aussagen müssen valide, fachlich korrekt und überprüfbar sein.
+KONTEXT:
+- Datum: ${today}
+- Geplante Nutzung: ${usage}
 
-HEUTIGES DATUM: ${today}
-VERWENDUNGSZWECK: ${usage}
+ANWEISUNG ZUR BEWERTUNG (SCORING):
+Nutze diese Skala streng objektiv. Sei kritisch!
+- 1-2: Massenware / Irreparabel zerstört / Kein historischer Wert
+- 3-5: Häufiges Objekt / Deutliche Schäden / Lokale Bedeutung
+- 6-8: Gehobene Qualität / Gute Substanz / Überregionale Bedeutung
+- 9-10: Unikat / Perfekter Originalzustand / Welterbe-Niveau
 
-Bitte erstelle ein professionelles Konservierungsgutachten mit folgenden Punkten:
+FORMATIERUNG (STRENG EINHALTEN):
+Nutze exakt diese Trenner. Keine Markdown-Formatierung (kein Fett/Kursiv) innerhalb der Datenfelder.
 
-0. KONSERVIERUNGS-PRIORITÄT (ZUERST BEWERTEN!):
-   - Dringlichkeit (1-10): Wie schnell muss gehandelt werden? (10=SOFORT, 1=keine Eile)
-   - Seltenheit (1-10): Wie selten ist dieses Artefakt? (10=extrem selten, 1=häufig)
-   - Historischer Wert (1-10): Kulturelle/wissenschaftliche Bedeutung (10=unersetzlich, 1=gering)
-   - Erhaltungszustand (1-10): Aktueller Zustand (10=perfekt, 1=kritisch)
-   - Gesamtbewertung: "KRITISCH" | "HOCH" | "MITTEL" | "STABIL"
-   - Begründung: 2-3 Sätze warum dieser Konservierungsaufwand gerechtfertigt ist
+###SECTION_START: PRIORITY###
+DRINGLICHKEIT: [Zahl 1-10]
+SELTENHEIT: [Zahl 1-10]
+WERT: [Zahl 1-10]
+ZUSTAND: [Zahl 1-10]
+GESAMT: [KRITISCH | HOCH | MITTEL | STABIL]
+BEGRÜNDUNG: [Kurzer, prägnanter Satz]
+###SECTION_END: PRIORITY###
 
-1. WISSENSCHAFTLICHE MATERIAL-IDENTIFIKATION:
-   - Präzise Bestimmung der Materialien (z.B. nicht nur "Holz", sondern "Nadelholz, vermutlich Fichte/Tanne" wenn erkennbar)
-   - Identifikation von Herstellungstechniken
-   - Materialkombinationen und deren Wechselwirkungen
+###SECTION_START: 1###
+[Hier wissenschaftliche Materialanalyse. Nutze Absätze für Lesbarkeit. Keine Aufzählungszeichen, sondern Fließtext oder strukturierte Blöcke.]
+###SECTION_END: 1###
 
-2. DETAILLIERTE ZUSTANDSANALYSE (Condition Report):
-   - Systematische Erfassung aller Schäden (Kartierung)
-   - Differenzierung zwischen historischen Schäden (Patina) und aktiven Schäden
-   - Ursachenanalyse für jeden Schaden (z.B. "Rissbildung durch hygroskopische Spannungen")
+###SECTION_START: 2###
+[Detaillierte Zustandsanalyse. Beschreibe Schäden topographisch (oben, unten, links, rechts).]
+###SECTION_END: 2###
 
-3. RISIKOBEWERTUNG (Risk Assessment):
-   - Akute Gefahren für die Substanz
-   - Langfristige Degradationsprozesse
-   - Allgemeine Risiken bei Lagerung
+###SECTION_START: 3###
+[Risikobewertung. Was droht dem Objekt?]
+###SECTION_END: 3###
 
-4. KONSERVIERUNGSKONZEPT FÜR LANGZEITLAGERUNG (Basis-Maßnahmen):
-   - Präventive Konservierung (Klima, Licht, Lagerung) mit KONKRETEN WERTEN (Lux, µW/lm, °C, rF%)
-   - Konservatorische Sicherungsmaßnahmen (nur reversible Eingriffe)
-   - Restaurierungsvorschläge (falls ästhetisch oder strukturell notwendig)
-   - Empfohlene Materialien für Lagerung/Verpackung (z.B. "säurefreies Seidenpapier nach ISO 9706")
+###SECTION_START: 4###
+[Konservierungskonzept. Nenne konkrete Werte für Klima (Temp/rF) und Licht (Lux).]
+###SECTION_END: 4###
 
 ${selectedUsage !== 'storage' ? `
-5. SPEZIELLE ANFORDERUNGEN FÜR: ${usage.toUpperCase()}:
-   - Was ist ZUSÄTZLICH zur Langzeitlagerung zu beachten?
-   - Spezifische Risiken durch ${selectedUsage === 'exhibition' ? 'dauerhafte Ausstellung' : selectedUsage === 'temporary' ? 'Transport und wechselnde Bedingungen' : 'Transport'}
-   - Besondere Schutzmaßnahmen
-   - Monitoring und regelmäßige Kontrollen
-   - Empfohlene maximale Ausstellungsdauer (falls zutreffend)
+###SECTION_START: 5###
+[Spezielle Anforderungen für ${usage}. Was ist zusätzlich zu beachten?]
+###SECTION_END: 5###
 ` : ''}
 
-${selectedUsage !== 'storage' ? '6' : '5'}. QUELLENVERZEICHNIS & LITERATUR:
-   - Liste am Ende UNBEDINGT die verwendeten wissenschaftlichen Quellen, Normen und Richtlinien auf.
-   - Zitiere relevante Standards (DIN, EN, ISO) oder Fachliteratur (z.B. ICOM-CC, IIC).
-   - Gib Links zu vertrauenswürdigen Online-Ressourcen an (z.B. hornemann-institut.de, canada.ca/conservation, etc.).
+###SECTION_START: 6###
+[Quellenverzeichnis. Mindestens 3 relevante Fachquellen/Normen.]
+###SECTION_END: 6###
 
 WICHTIG:
-- Arbeite streng wissenschaftlich.
-- Unterscheide klar zwischen Fakten (sichtbar) und Vermutungen.
-- Verwende die korrekte Fachterminologie.
-- Gib am Ende IMMER eine Liste der verwendeten Quellen und Links an.
-- Verwende das heutige Datum (${today}) wenn du ein Begutachtungsdatum angibst.
-- Die Basis-Analyse ist IMMER für Langzeitlagerung. Nur wenn ein anderer Verwendungszweck gewählt wurde, füge Abschnitt 5 hinzu.
-
-Antworte auf Deutsch in einem strukturierten, gut lesbaren Format.`;
+- Keine Markdown-Sternchen (**) verwenden!
+- Halte dich strikt an die Struktur.
+- Sei extrem kritisch bei der Bewertung. Eine 8-10 ist eine absolute Ausnahme.`;
         }
 
         function newAnalysis() {
