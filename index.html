@@ -762,6 +762,13 @@
             letter-spacing: 0.05em;
         }
 
+        .gauge-description {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--museum-charcoal);
+            margin-top: 4px;
+        }
+
         .priority-justification-box {
             background: rgba(255, 255, 255, 0.8);
             border-radius: 12px;
@@ -914,7 +921,7 @@
                 <div class="header-icon">🏛️</div>
                 <div>
                     <div class="header-title">KONSERVIEREN <span
-                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.10</span></div>
+                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.11</span></div>
                     <div class="header-subtitle">Artefakt-Analyse für Museum & Archiv</div>
                 </div>
             </div>
@@ -1431,46 +1438,83 @@
 
                 const overallClass = overall.toLowerCase().replace(/ü/g, 'u');
 
-                // Determine gauge color based on value
-                function getGaugeColor(value) {
-                    if (value >= 8) return '#16a34a'; // green
-                    if (value >= 6) return '#ca8a04'; // yellow
-                    if (value >= 4) return '#ea580c'; // orange
-                    return '#dc2626'; // red
+                // Metric-specific color functions
+                function getUrgencyColor(value) {
+                    // Low urgency = green (good), high urgency = red (critical)
+                    if (value <= 3) return '#16a34a'; // green - no rush
+                    if (value <= 6) return '#ca8a04'; // yellow - moderate
+                    if (value <= 8) return '#ea580c'; // orange - soon
+                    return '#dc2626'; // red - urgent!
                 }
+
+                function getRarityColor(value) {
+                    // Low rarity = gray (common), high rarity = gold (rare/valuable)
+                    if (value <= 3) return '#9ca3af'; // gray - common
+                    if (value <= 6) return '#78716c'; // brown - uncommon
+                    if (value <= 8) return '#ca8a04'; // gold - rare
+                    return '#d97706'; // bright gold - very rare!
+                }
+
+                function getValueColor(value) {
+                    // Low value = gray (low importance), high value = gold (precious)
+                    if (value <= 3) return '#9ca3af'; // gray - low value
+                    if (value <= 6) return '#78716c'; // brown - moderate value
+                    if (value <= 8) return '#ca8a04'; // gold - high value
+                    return '#d97706'; // bright gold - invaluable!
+                }
+
+                function getConditionColor(value) {
+                    // Low condition = red (bad state), high condition = green (good state)
+                    if (value <= 3) return '#dc2626'; // red - critical condition
+                    if (value <= 6) return '#ea580c'; // orange - fair condition
+                    if (value <= 8) return '#ca8a04'; // yellow - good condition
+                    return '#16a34a'; // green - excellent condition!
+                }
+
+                function getValueLabel(value) {
+                    if (value <= 3) return 'Niedrig';
+                    if (value <= 6) return 'Mittel';
+                    return 'Hoch';
+                }
+
+                // Icon without stars
+                const badgeIcon = overall === 'KRITISCH' ? '🚨' : overall === 'HOCH' ? '⚡' : overall === 'MITTEL' ? '⚠️' : '✅';
 
                 html += `
                     <div class="priority-hero ${overallClass}">
                         <div class="priority-header">
                             <div class="priority-badge ${overallClass}">
-                                ${overall === 'KRITISCH' ? '🚨' : overall === 'HOCH' ? '⚡' : overall === 'MITTEL' ? '⚠️' : '✅'} 
-                                ${overall}
+                                ${badgeIcon} ${overall}
                             </div>
                         </div>
                         <div class="priority-gauges">
                             <div class="gauge-container">
-                                <div class="gauge-circle" style="--gauge-value: ${urgency * 10}; --gauge-color: ${getGaugeColor(urgency)};">
+                                <div class="gauge-circle" style="--gauge-value: ${urgency * 10}; --gauge-color: ${getUrgencyColor(urgency)};">
                                     <div class="gauge-inner">${urgency}</div>
                                 </div>
                                 <div class="gauge-label">Dringlichkeit</div>
+                                <div class="gauge-description">${getValueLabel(urgency)}</div>
                             </div>
                             <div class="gauge-container">
-                                <div class="gauge-circle" style="--gauge-value: ${rarity * 10}; --gauge-color: ${getGaugeColor(rarity)};">
+                                <div class="gauge-circle" style="--gauge-value: ${rarity * 10}; --gauge-color: ${getRarityColor(rarity)};">
                                     <div class="gauge-inner">${rarity}</div>
                                 </div>
                                 <div class="gauge-label">Seltenheit</div>
+                                <div class="gauge-description">${getValueLabel(rarity)}</div>
                             </div>
                             <div class="gauge-container">
-                                <div class="gauge-circle" style="--gauge-value: ${historicalValue * 10}; --gauge-color: ${getGaugeColor(historicalValue)};">
+                                <div class="gauge-circle" style="--gauge-value: ${historicalValue * 10}; --gauge-color: ${getValueColor(historicalValue)};">
                                     <div class="gauge-inner">${historicalValue}</div>
                                 </div>
                                 <div class="gauge-label">Historischer Wert</div>
+                                <div class="gauge-description">${getValueLabel(historicalValue)}</div>
                             </div>
                             <div class="gauge-container">
-                                <div class="gauge-circle" style="--gauge-value: ${condition * 10}; --gauge-color: ${getGaugeColor(condition)};">
+                                <div class="gauge-circle" style="--gauge-value: ${condition * 10}; --gauge-color: ${getConditionColor(condition)};">
                                     <div class="gauge-inner">${condition}</div>
                                 </div>
                                 <div class="gauge-label">Zustand</div>
+                                <div class="gauge-description">${getValueLabel(condition)}</div>
                             </div>
                         </div>
                         ${justification ? `<div class="priority-justification-box">💡 <strong>Warum wichtig:</strong> ${justification}</div>` : ''}
