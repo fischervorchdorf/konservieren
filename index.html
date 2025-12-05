@@ -402,7 +402,7 @@
 
         .images-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 15px;
             margin-bottom: 20px;
         }
@@ -921,7 +921,7 @@
                 <div class="header-icon">🏛️</div>
                 <div>
                     <div class="header-title">KONSERVIEREN <span
-                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.12</span></div>
+                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.13</span></div>
                     <div class="header-subtitle">Artefakt-Analyse für Museum & Archiv</div>
                 </div>
             </div>
@@ -1476,12 +1476,33 @@
                     return '#16a34a'; // green - excellent condition!
                 }
 
-                function getValueLabel(value) {
-                    if (value <= 3) return 'Niedrig';
-                    if (value <= 6) return 'Mittel';
-                    return 'Hoch';
+                function getUrgencyLabel(value) {
+                    if (value <= 2) return '✅ Keine Eile';
+                    if (value <= 4) return '⏰ Zeit nehmen';
+                    if (value <= 7) return '⚠️ Bald handeln';
+                    return '🚨 SOFORT!';
                 }
 
+                function getRarityLabel(value) {
+                    if (value <= 2) return '⚪ Häufig';
+                    if (value <= 5) return '🔵 Ungewöhnlich';
+                    if (value <= 8) return '🟡 Selten';
+                    return '🟨 Sehr selten!';
+                }
+
+                function getValueLabel(value) {
+                    if (value <= 2) return '📄 Geringe Bedeutung';
+                    if (value <= 5) return '📌 Wichtig';
+                    if (value <= 8) return '💎 Sehr wertvoll';
+                    return '👑 Unersetzlich!';
+                }
+
+                function getConditionLabel(value) {
+                    if (value <= 2) return '💔 Kritisch';
+                    if (value <= 4) return '😟 Beschädigt';
+                    if (value <= 7) return '😊 Gut';
+                    return '✨ Exzellent!';
+                }
                 // Icon without stars
                 const badgeIcon = overall === 'KRITISCH' ? '🚨' : overall === 'HOCH' ? '⚡' : overall === 'MITTEL' ? '⚠️' : '✅';
 
@@ -1498,14 +1519,14 @@
                                     <div class="gauge-inner">${urgency}</div>
                                 </div>
                                 <div class="gauge-label">Dringlichkeit</div>
-                                <div class="gauge-description">${getValueLabel(urgency)}</div>
+                                <div class="gauge-description">${getUrgencyLabel(urgency)}</div>
                             </div>
                             <div class="gauge-container">
                                 <div class="gauge-circle" style="--gauge-value: ${rarity * 10}; --gauge-color: ${getRarityColor(rarity)};">
                                     <div class="gauge-inner">${rarity}</div>
                                 </div>
                                 <div class="gauge-label">Seltenheit</div>
-                                <div class="gauge-description">${getValueLabel(rarity)}</div>
+                                <div class="gauge-description">${getRarityLabel(rarity)}</div>
                             </div>
                             <div class="gauge-container">
                                 <div class="gauge-circle" style="--gauge-value: ${historicalValue * 10}; --gauge-color: ${getValueColor(historicalValue)};">
@@ -1519,7 +1540,7 @@
                                     <div class="gauge-inner">${condition}</div>
                                 </div>
                                 <div class="gauge-label">Zustand</div>
-                                <div class="gauge-description">${getValueLabel(condition)}</div>
+                                <div class="gauge-description">${getConditionLabel(condition)}</div>
                             </div>
                         </div>
                         ${justification ? `<div class="priority-justification-box">💡 <strong>Warum wichtig:</strong> ${justification}</div>` : ''}
@@ -1550,22 +1571,24 @@
                 if (match) {
                     let content = match[0].replace(/^\d+\.\s*[^\n]+\n/, '').trim();
 
-                    // Clean formatting
-                    content = content.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-                    content = content.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
+                    // Clean formatting - improved regex for better matching
+                    // Handle **bold** - using greedy matching but stop at double asterisks
+                    content = content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+                    // Handle *italic* - but not if it's part of **
+                    content = content.replace(/(?<!\*)\*([^*\n]+?)\*(?!\*)/g, '<em>$1</em>');
 
                     // Handle numbered values (e.g., "18-20 °C")
                     content = content.replace(/(\d+[-–]\d+\s*[°%]?\s*[CF%]?\w*)/g, '<span class="value-badge">$1</span>');
                     content = content.replace(/(\d+\s*Lux)/g, '<span class="value-badge">$1</span>');
 
                     // Convert bullet points to list items
-                    const hasBullets = content.includes('\n- ') || content.includes('\n * ');
+                    const hasBullets = content.includes('\n- ') || content.includes('\n * ') || content.includes('\n• ');
                     if (hasBullets) {
-                        content = content.replace(/^[\s-]*[-*]\s+(.+)$/gm, '<li>$1</li>');
+                        content = content.replace(/^[\s-]*[-*•]\s+(.+)$/gm, '<li>$1</li>');
                         content = content.replace(/(<li>[\s\S]*?<\/li>)/s, '<ul>$1</ul>');
                     }
 
-                    // Convert paragraphs
+                    // Convert paragraphs - only if not already in list
                     if (!content.includes('<ul>')) {
                         content = content.replace(/\n\n/g, '</p><p>');
                         content = '<p>' + content + '</p>';
