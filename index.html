@@ -925,7 +925,7 @@
                 <div class="header-icon">🏛️</div>
                 <div>
                     <div class="header-title">KONSERVIEREN <span
-                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.18</span></div>
+                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.19</span></div>
                     <div class="header-subtitle">Artefakt-Analyse für Museum & Archiv</div>
                 </div>
             </div>
@@ -1648,25 +1648,56 @@ WICHTIG:
 
             const timestamp = new Date().toLocaleString('de-AT');
 
-            let content = `KONSERVIERUNGS-ANALYSE\n${'='.repeat(70)}\n`;
+            let content = `KONSERVIERUNGS-ANALYSE\n`;
+            content += `${'='.repeat(60)}\n`;
             content += `Zeitpunkt: ${timestamp}\n`;
-            content += `${'='.repeat(70)}\n\n`;
+            content += `${'='.repeat(60)}\n\n`;
 
             // Kontext-Informationen
             let hasContext = false;
+            let contextContent = '';
             for (let i = 0; i < 6; i++) {
                 if (images[i] && contextTexts[i]) {
-                    if (!hasContext) {
-                        content += `KONTEXT-INFORMATIONEN:\n${'-'.repeat(70)}\n`;
-                        hasContext = true;
-                    }
-                    content += `Bild ${i + 1}: ${contextTexts[i]}\n`;
+                    contextContent += `Bild ${i + 1}: ${contextTexts[i]}\n`;
+                    hasContext = true;
                 }
             }
-            if (hasContext) content += `\n`;
+            if (hasContext) {
+                content += `DOKUMENTATION\n${'-'.repeat(30)}\n`;
+                content += contextContent + `\n`;
+            }
 
-            content += `ANALYSE:\n${'-'.repeat(70)}\n${currentAnalysis}\n\n`;
-            content += `${'='.repeat(70)}\n`;
+            // Parse Sections
+            const sections = [
+                { id: 'PRIORITY', title: 'ZUSAMMENFASSUNG & PRIORITÄT' },
+                { id: '1', title: 'MATERIAL-IDENTIFIKATION' },
+                { id: '2', title: 'ZUSTANDSANALYSE' },
+                { id: '3', title: 'RISIKOBEWERTUNG' },
+                { id: '4', title: 'KONSERVIERUNGSKONZEPT' },
+                { id: '5', title: 'HANDLUNGSEMPFEHLUNGEN' },
+                { id: '6', title: 'QUELLEN & LITERATUR' }
+            ];
+
+            const getSectionContent = (id) => {
+                const regex = new RegExp(`###SECTION_START: ${id}###([\\s\\S]*?)###SECTION_END: ${id}###`);
+                const match = currentAnalysis.match(regex);
+                return match ? match[1].trim() : null;
+            };
+
+            sections.forEach(section => {
+                let sectionContent = getSectionContent(section.id);
+                if (sectionContent) {
+                    // Clean content
+                    sectionContent = sectionContent.replace(/\*\*/g, ''); // Remove bold
+
+                    content += `${'='.repeat(60)}\n`;
+                    content += `${section.title}\n`;
+                    content += `${'='.repeat(60)}\n`;
+                    content += `${sectionContent}\n\n`;
+                }
+            });
+
+            content += `${'-'.repeat(60)}\n`;
             content += `Powered by Heimatverein Vorchdorf\n`;
             content += `https://heimatverein-vorchdorf.at\n`;
 
