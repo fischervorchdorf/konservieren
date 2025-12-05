@@ -659,138 +659,241 @@
             }
         }
 
-        /* Priority Banner Styles */
-        .priority-banner {
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            border-left: 5px solid;
+        /* Priority Banner - Redesigned for Maximum Impact */
+        .priority-hero {
             background: white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+            position: relative;
         }
 
-        .priority-banner.kritisch {
-            border-left-color: #dc2626;
-            background: linear-gradient(to right, #fef2f2, white);
+        .priority-hero.kritisch {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border: 3px solid #dc2626;
         }
 
-        .priority-banner.hoch {
-            border-left-color: #ea580c;
-            background: linear-gradient(to right, #fff7ed, white);
+        .priority-hero.hoch {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            border: 3px solid #ea580c;
         }
 
-        .priority-banner.mittel {
-            border-left-color: #ca8a04;
-            background: linear-gradient(to right, #fefce8, white);
+        .priority-hero.mittel {
+            background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
+            border: 3px solid #ca8a04;
         }
 
-        .priority-banner.stabil {
-            border-left-color: #16a34a;
-            background: linear-gradient(to right, #f0fdf4, white);
+        .priority-hero.stabil {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 3px solid #16a34a;
         }
 
-        .priority-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: var(--museum-charcoal);
+        .priority-header {
+            text-align: center;
+            margin-bottom: 30px;
         }
 
-        .priority-scores {
+        .priority-badge {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 28px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .priority-badge.kritisch {
+            background: linear-gradient(to right, #dc2626, #991b1b);
+            color: white;
+        }
+
+        .priority-badge.hoch {
+            background: linear-gradient(to right, #ea580c, #c2410c);
+            color: white;
+        }
+
+        .priority-badge.mittel {
+            background: linear-gradient(to right, #ca8a04, #a16207);
+            color: white;
+        }
+
+        .priority-badge.stabil {
+            background: linear-gradient(to right, #16a34a, #15803d);
+            color: white;
+        }
+
+        .priority-gauges {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
-            margin: 15px 0;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 24px;
+            margin: 30px 0;
         }
 
-        .score-item {
+        .gauge-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
         }
 
-        .score-label {
+        .gauge-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(var(--gauge-color) calc(var(--gauge-value) * 3.6deg), #e5e7eb calc(var(--gauge-value) * 3.6deg));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .gauge-inner {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--museum-charcoal);
+        }
+
+        .gauge-label {
             font-size: 11px;
+            font-weight: 600;
             color: #6b7280;
-            margin-bottom: 5px;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
 
-        .score-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--museum-gold);
-        }
-
-        .priority-justification {
-            margin-top: 15px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 8px;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        /* Result Section Cards */
-        .result-card {
-            background: white;
+        .priority-justification-box {
+            background: rgba(255, 255, 255, 0.8);
             border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 20px;
-            border: 2px solid var(--museum-stone);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-top: 30px;
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--museum-charcoal);
+            border-left: 4px solid var(--museum-gold);
         }
 
-        .result-card h3 {
-            font-family: 'Cinzel', serif;
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--museum-charcoal);
-            margin-bottom: 15px;
+        /* Section Blocks - Colorful Gradients */
+        .section-block {
+            margin-bottom: 32px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .section-header {
+            padding: 24px 32px;
+            color: white;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
-        .result-card h3 .icon {
+        .section-header h3 {
+            font-family: 'Cinzel', serif;
             font-size: 24px;
+            font-weight: 700;
+            margin: 0;
         }
 
-        .result-card-content {
+        .section-header .icon {
+            font-size: 32px;
+        }
+
+        .section-body {
+            background: white;
+            padding: 32px;
+            font-size: 16px;
             line-height: 1.8;
             color: var(--museum-charcoal);
         }
 
-        .result-card-content p {
-            margin-bottom: 12px;
+        /* Section Color Themes */
+        .section-blue .section-header {
+            background: linear-gradient(to right, #0c4a6e, #0f766e);
         }
 
-        .result-card-content strong {
+        .section-purple .section-header {
+            background: linear-gradient(to right, #581c87, #4338ca);
+        }
+
+        .section-red .section-header {
+            background: linear-gradient(to right, #7f1d1d, #9a3412);
+        }
+
+        .section-red .section-body {
+            background: linear-gradient(to bottom, #fef2f2, white);
+        }
+
+        .section-green .section-header {
+            background: linear-gradient(to right, #064e3b, #14532d);
+        }
+
+        .section-amber .section-header {
+            background: linear-gradient(to right, #78350f, #713f12);
+        }
+
+        .section-amber .section-body {
+            background: linear-gradient(to bottom, #fffbeb, white);
+        }
+
+        /* Content Formatting */
+        .section-body p {
+            margin-bottom: 16px;
+        }
+
+        .section-body strong {
             color: var(--museum-gold);
+            font-weight: 700;
         }
 
-        .sources-list {
+        .section-body ul {
             list-style: none;
             padding: 0;
+            margin: 20px 0;
         }
 
-        .sources-list li {
-            padding: 8px 0;
-            border-bottom: 1px solid var(--museum-stone);
+        .section-body li {
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            background: #f9fafb;
+            border-left: 4px solid var(--museum-gold);
+            border-radius: 6px;
         }
 
-        .sources-list li:last-child {
-            border-bottom: none;
-        }
-
-        .sources-list a {
+        .section-body a {
             color: var(--museum-gold);
             text-decoration: none;
-            transition: color 0.3s;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s;
         }
 
-        .sources-list a:hover {
-            color: var(--museum-charcoal);
-            text-decoration: underline;
+        .section-body a:hover {
+            border-bottom-color: var(--museum-gold);
+        }
+
+        .value-badge {
+            display: inline-block;
+            background: var(--museum-gold);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0 4px;
         }
     </style>
 </head>
@@ -803,7 +906,7 @@
                 <div class="header-icon">🏛️</div>
                 <div>
                     <div class="header-title">KONSERVIEREN <span
-                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.7</span></div>
+                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.8</span></div>
                     <div class="header-subtitle">Artefakt-Analyse für Museum & Archiv</div>
                 </div>
             </div>
@@ -1303,57 +1406,77 @@
         }
 
         function formatAnalysisResult(text) {
-            // Parse the text and structure it into HTML
             let html = '';
 
-            // Extract priority section (0. KONSERVIERUNGS-PRIORITÄT)
+            // Extract priority section
             const priorityMatch = text.match(/0\.\s*KONSERVIERUNGS-PRIORITÄT.*?(?=\n\n\d+\.|$)/s);
             if (priorityMatch) {
                 const priorityText = priorityMatch[0];
 
                 // Extract scores
-                const urgency = priorityText.match(/Dringlichkeit.*?(\d+)/)?.[1] || '?';
-                const rarity = priorityText.match(/Seltenheit.*?(\d+)/)?.[1] || '?';
-                const historicalValue = priorityText.match(/Historischer Wert.*?(\d+)/)?.[1] || '?';
-                const condition = priorityText.match(/Erhaltungszustand.*?(\d+)/)?.[1] || '?';
-                const overall = priorityText.match(/Gesamtbewertung:\s*"?([^"\n]+)"?/)?.[1] || 'MITTEL';
+                const urgency = parseInt(priorityText.match(/Dringlichkeit.*?(\d+)/)?.[1] || '5');
+                const rarity = parseInt(priorityText.match(/Seltenheit.*?(\d+)/)?.[1] || '5');
+                const historicalValue = parseInt(priorityText.match(/Historischer Wert.*?(\d+)/)?.[1] || '5');
+                const condition = parseInt(priorityText.match(/Erhaltungszustand.*?(\d+)/)?.[1] || '5');
+                const overall = priorityText.match(/Gesamtbewertung:\s*"?([^"\n]+)"?/)?.[1]?.trim() || 'MITTEL';
                 const justification = priorityText.match(/Begründung:\s*(.+)/s)?.[1]?.trim() || '';
 
                 const overallClass = overall.toLowerCase().replace(/ü/g, 'u');
 
+                // Determine gauge color based on value
+                function getGaugeColor(value) {
+                    if (value >= 8) return '#16a34a'; // green
+                    if (value >= 6) return '#ca8a04'; // yellow
+                    if (value >= 4) return '#ea580c'; // orange
+                    return '#dc2626'; // red
+                }
+
                 html += `
-                    <div class="priority-banner ${overallClass}">
-                        <div class="priority-title">🎯 Konservierungs-Priorität: ${overall.toUpperCase()}</div>
-                        <div class="priority-scores">
-                            <div class="score-item">
-                                <div class="score-label">Dringlichkeit</div>
-                                <div class="score-value">${urgency}/10</div>
-                            </div>
-                            <div class="score-item">
-                                <div class="score-label">Seltenheit</div>
-                                <div class="score-value">${rarity}/10</div>
-                            </div>
-                            <div class="score-item">
-                                <div class="score-label">Hist. Wert</div>
-                                <div class="score-value">${historicalValue}/10</div>
-                            </div>
-                            <div class="score-item">
-                                <div class="score-label">Zustand</div>
-                                <div class="score-value">${condition}/10</div>
+                    <div class="priority-hero ${overallClass}">
+                        <div class="priority-header">
+                            <div class="priority-badge ${overallClass}">
+                                ${overall === 'KRITISCH' ? '🚨' : overall === 'HOCH' ? '⚡' : overall === 'MITTEL' ? '⚠️' : '✅'} 
+                                ${overall}
                             </div>
                         </div>
-                        ${justification ? `<div class="priority-justification">${justification}</div>` : ''}
+                        <div class="priority-gauges">
+                            <div class="gauge-container">
+                                <div class="gauge-circle" style="--gauge-value: ${urgency * 10}; --gauge-color: ${getGaugeColor(urgency)};">
+                                    <div class="gauge-inner">${urgency}</div>
+                                </div>
+                                <div class="gauge-label">Dringlichkeit</div>
+                            </div>
+                            <div class="gauge-container">
+                                <div class="gauge-circle" style="--gauge-value: ${rarity * 10}; --gauge-color: ${getGaugeColor(rarity)};">
+                                    <div class="gauge-inner">${rarity}</div>
+                                </div>
+                                <div class="gauge-label">Seltenheit</div>
+                            </div>
+                            <div class="gauge-container">
+                                <div class="gauge-circle" style="--gauge-value: ${historicalValue * 10}; --gauge-color: ${getGaugeColor(historicalValue)};">
+                                    <div class="gauge-inner">${historicalValue}</div>
+                                </div>
+                                <div class="gauge-label">Historischer Wert</div>
+                            </div>
+                            <div class="gauge-container">
+                                <div class="gauge-circle" style="--gauge-value: ${condition * 10}; --gauge-color: ${getGaugeColor(condition)};">
+                                    <div class="gauge-inner">${condition}</div>
+                                </div>
+                                <div class="gauge-label">Zustand</div>
+                            </div>
+                        </div>
+                        ${justification ? `<div class="priority-justification-box">💡 <strong>Warum wichtig:</strong> ${justification}</div>` : ''}
                     </div>
                 `;
             }
 
-            // Define sections with icons
+            // Define sections with their color themes
             const sections = [
-                { number: 1, title: 'Material-Identifikation', icon: '🔬' },
-                { number: 2, title: 'Zustandsanalyse', icon: '📋' },
-                { number: 3, title: 'Risikobewertung', icon: '⚠️' },
-                { number: 4, title: 'Konservierungskonzept', icon: '🛡️' },
-                { number: 5, title: 'Quellen & Literatur', icon: '📚' }
+                { number: 1, title: 'Material-Identifikation', icon: '🔬', theme: 'blue' },
+                { number: 2, title: 'Zustandsanalyse', icon: '📋', theme: 'purple' },
+                { number: 3, title: 'Risikobewertung', icon: '⚠️', theme: 'red' },
+                { number: 4, title: 'Konservierungskonzept', icon: '🛡️', theme: 'green' },
+                { number: 5, title: 'Quellen & Literatur', icon: '📚', theme: 'amber' }
             ];
 
             sections.forEach(section => {
@@ -1363,36 +1486,51 @@
                 if (match) {
                     let content = match[0].replace(/^\d+\.\s*[^\n]+\n/, '').trim();
 
-                    // Clean up asterisks and format lists
+                    // Clean formatting
                     content = content.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
                     content = content.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
-                    content = content.replace(/^[\s-]*-\s+(.+)$/gm, '<li>$1</li>');
-                    content = content.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
-                    content = content.replace(/\n\n/g, '</p><p>');
-                    content = '<p>' + content + '</p>';
 
-                    // Special handling for sources (section 5)
+                    // Handle numbered values (e.g., "18-20 °C")
+                    content = content.replace(/(\d+[-–]\d+\s*[°%]?\s*[CF%]?\w*)/g, '<span class="value-badge">$1</span>');
+                    content = content.replace(/(\d+\s*Lux)/g, '<span class="value-badge">$1</span>');
+
+                    // Convert bullet points to list items
+                    const hasBullets = content.includes('\n- ') || content.includes('\n * ');
+                    if (hasBullets) {
+                        content = content.replace(/^[\s-]*[-*]\s+(.+)$/gm, '<li>$1</li>');
+                        content = content.replace(/(<li>[\s\S]*?<\/li>)/s, '<ul>$1</ul>');
+                    }
+
+                    // Convert paragraphs
+                    if (!content.includes('<ul>')) {
+                        content = content.replace(/\n\n/g, '</p><p>');
+                        content = '<p>' + content + '</p>';
+                    }
+
+                    // Special handling for sources section
                     if (section.number === 5) {
-                        const urlRegex = /(https?:\/\/[^\s<]+)/g;
-                        content = content.replace(urlRegex, '<a href="$1" target="_blank">$1</a>');
+                        const urlRegex = /(https?:\/\/[^\s<)]+)/g;
+                        content = content.replace(urlRegex, '<a href="$1" target="_blank">🔗 $1</a>');
                     }
 
                     html += `
-                        <div class="result-card">
-                            <h3><span class="icon">${section.icon}</span> ${section.title}</h3>
-                            <div class="result-card-content">${content}</div>
+                        <div class="section-block section-${section.theme}">
+                            <div class="section-header">
+                                <span class="icon">${section.icon}</span>
+                                <h3>${section.title}</h3>
+                            </div>
+                            <div class="section-body">${content}</div>
                         </div>
                     `;
                 }
             });
 
-            // Fallback: if no sections found, show original text
+            // Fallback if parsing failed
             if (!html) {
-                // Clean and format the original text
                 let fallbackHtml = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
                 fallbackHtml = fallbackHtml.replace(/\n\n/g, '</p><p>');
-                fallbackHtml = '<p>' + fallbackHtml + '</p>';
-                html = `<div class="result-card"><div class="result-card-content">${fallbackHtml}</div></div>`;
+                fallbackHtml = '<div class="section-block section-blue"><div class="section-body"><p>' + fallbackHtml + '</p></div></div>';
+                html = fallbackHtml;
             }
 
             return html;
