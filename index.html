@@ -755,11 +755,8 @@
         }
 
         .gauge-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            display: none;
+            /* Hide redundant label text */
         }
 
         .gauge-description {
@@ -921,7 +918,7 @@
                 <div class="header-icon">🏛️</div>
                 <div>
                     <div class="header-title">KONSERVIEREN <span
-                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.13</span></div>
+                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.14</span></div>
                     <div class="header-subtitle">Artefakt-Analyse für Museum & Archiv</div>
                 </div>
             </div>
@@ -1438,7 +1435,8 @@
                 const rarity = parseInt(priorityText.match(/Seltenheit.*?(\d+)/)?.[1] || '5');
                 const historicalValue = parseInt(priorityText.match(/Historischer Wert.*?(\d+)/)?.[1] || '5');
                 const condition = parseInt(priorityText.match(/Erhaltungszustand.*?(\d+)/)?.[1] || '5');
-                const overall = priorityText.match(/Gesamtbewertung:\s*"?([^"\n]+)"?/)?.[1]?.trim() || 'MITTEL';
+                const overallRaw = priorityText.match(/Gesamtbewertung:\s*"?([^"\n]+)"?/)?.[1]?.trim() || 'MITTEL';
+                const overall = overallRaw.replace(/\*/g, ''); // Remove asterisks
                 const justification = priorityText.match(/Begründung:\s*(.+)/s)?.[1]?.trim() || '';
 
                 const overallClass = overall.toLowerCase().replace(/ü/g, 'u');
@@ -1504,13 +1502,13 @@
                     return '✨ Exzellent!';
                 }
                 // Icon without stars
-                const badgeIcon = overall === 'KRITISCH' ? '🚨' : overall === 'HOCH' ? '⚡' : overall === 'MITTEL' ? '⚠️' : '✅';
+                const badgeIcon = overall.includes('KRITISCH') ? '🚨' : overall.includes('HOCH') ? '⚡' : overall.includes('MITTEL') ? '⚠️' : '✅';
 
                 html += `
                     <div class="priority-hero ${overallClass}">
                         <div class="priority-header">
                             <div class="priority-badge ${overallClass}">
-                                ${badgeIcon} ${overall}
+                                ${badgeIcon} <!-- Text removed as requested -->
                             </div>
                         </div>
                         <div class="priority-gauges">
@@ -1571,29 +1569,40 @@
                 if (match) {
                     let content = match[0].replace(/^\d+\.\s*[^\n]+\n/, '').trim();
 
-                    // Clean formatting - improved regex for better matching
-                    // Handle **bold** - using greedy matching but stop at double asterisks
+                    // Step 1: Convert markdown bold - multiple patterns
+                    content = content.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
                     content = content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-                    // Handle *italic* - but not if it's part of **
-                    content = content.replace(/(?<!\*)\*([^*\n]+?)\*(?!\*)/g, '<em>$1</em>');
 
-                    // Handle numbered values (e.g., "18-20 °C")
+                    // Step 2: Convert single * to bullets (at start of line or after newline)
+                    content = content.replace(/(^|\n)\s*\*\s+/g, '$1• ');
+
+                    // Step 3: Add breaks after colons followed by Capital letter (likely a new field)
+                    content = content.replace(/:\s*([A-ZÄÖÜ])/g, ':<br> $1');
+
+                    // Step 4: Handle values (add badge style)
                     content = content.replace(/(\d+[-–]\d+\s*[°%]?\s*[CF%]?\w*)/g, '<span class="value-badge">$1</span>');
                     content = content.replace(/(\d+\s*Lux)/g, '<span class="value-badge">$1</span>');
 
-                    // Convert bullet points to list items
-                    const hasBullets = content.includes('\n- ') || content.includes('\n * ') || content.includes('\n• ');
+                    // Step 5: Bullet lists
+                    const hasBullets = content.includes('\n- ') || content.includes('\n• ') || content.includes('• ');
                     if (hasBullets) {
-                        content = content.replace(/^[\s-]*[-*•]\s+(.+)$/gm, '<li>$1</li>');
-                        content = content.replace(/(<li>[\s\S]*?<\/li>)/s, '<ul>$1</ul>');
+                        // Replace bullets at line start
+                        content = content.replace(/^\s*[-•]\s+(.+)$/gm, '<li>$1</li>');
+                        // Wrap contiguous li elements in ul
+                        content = content.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>');
                     }
 
-                    // Convert paragraphs - only if not already in list
+                    // Step 6: Line breaks for non-list content
                     if (!content.includes('<ul>')) {
-                        content = content.replace(/\n\n/g, '</p><p>');
+                        // Single line breaks become <br>
+                        content = content.replace(/\n(?!\n)/g, '<br>\n');
+                        // Double line breaks become paragraph breaks
+                        content = content.replace(/\n\n+/g, '</p><p>');
                         content = '<p>' + content + '</p>';
+                    } else {
+                        // Even with lists, we might have paragraphs outside
+                        content = content.replace(/\n\n+/g, '<br><br>');
                     }
-
 
                     // Special handling for sources section (can be 5 or 6)
                     if (section.number === 5 || section.number === 6) {
