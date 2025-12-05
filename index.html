@@ -925,7 +925,7 @@
                 <div class="header-icon">🏛️</div>
                 <div>
                     <div class="header-title">KONSERVIEREN <span
-                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.16</span></div>
+                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.17</span></div>
                     <div class="header-subtitle">Artefakt-Analyse für Museum & Archiv</div>
                 </div>
             </div>
@@ -970,36 +970,8 @@
         <!-- Fehleranzeige -->
         <div id="errorSection" class="error hidden"></div>
 
-        <!-- Verwendungszweck -->
-        <div id="usageSection" class="usage-section hidden">
-            <h3>📋 Verwendungszweck des Artefakts</h3>
-            <p style="text-align: center; margin-bottom: 20px; color: #6b7280; font-size: 14px;">
-                Basis-Analyse erfolgt immer für <strong
-                    style="color: var(--museum-charcoal);">Langzeitlagerung</strong>.<br>
-                Wähle optional einen speziellen Zweck für zusätzliche Empfehlungen.
-            </p>
-            <div class="usage-options">
-                <div class="usage-option" onclick="selectUsage('exhibition')">
-                    <div style="font-size: 32px; margin-bottom: 10px;">🖼️</div>
-                    <strong>Dauerausstellung</strong>
-                </div>
-                <div class="usage-option" onclick="selectUsage('temporary')">
-                    <div style="font-size: 32px; margin-bottom: 10px;">🎨</div>
-                    <strong>Wechselausstellung</strong>
-                </div>
-                <div class="usage-option" onclick="selectUsage('storage')">
-                    <div style="font-size: 32px; margin-bottom: 10px;">📦</div>
-                    <strong>Langzeitlagerung</strong>
-                </div>
-                <div class="usage-option" onclick="selectUsage('transport')">
-                    <div style="font-size: 32px; margin-bottom: 10px;">🚚</div>
-                    <strong>Transport</strong>
-                </div>
-            </div>
-        </div>
-
         <!-- Upload Bereich -->
-        <div id="uploadSection" class="upload-section hidden">
+        <div id="uploadSection" class="upload-section">
             <!-- Modern Upload Area wie WasBinIch -->
             <div class="upload-area">
                 <div class="upload-icon-container">
@@ -1168,11 +1140,10 @@
     <script>
         let images = [null, null, null, null, null, null];
         let contextTexts = ['', '', '', '', '', ''];
-        let selectedUsage = null;
         let currentAnalysis = null;
         let apiKey = 'AIzaSyBudkecvmZX9cRyXRaPw16Fct2MbGDBQog'; // Shared domain-restricted key (fischervorchdorf.github.io/*)
 
-        // Automatically show usage selection on load
+        // Automatically show upload section on load
         window.onload = function () {
             // Load saved API key if available
             const savedKey = localStorage.getItem('gemini_api_key');
@@ -1181,26 +1152,10 @@
                 document.getElementById('apiKeyInput').value = savedKey;
             }
 
-            // Show usage selection directly, keep hero section visible
-            document.getElementById('usageSection').classList.remove('hidden');
+            // Show upload section directly
+            document.getElementById('uploadSection').classList.remove('hidden');
             document.getElementById('apiKeySection').classList.add('hidden'); // Ensure API key section is hidden
         };
-
-
-        function selectUsage(usage) {
-            selectedUsage = usage;
-
-            // Alle Optionen zurücksetzen
-            document.querySelectorAll('.usage-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-
-            // Ausgewählte Option markieren
-            event.target.closest('.usage-option').classList.add('selected');
-
-            // Upload-Bereich anzeigen
-            document.getElementById('uploadSection').classList.remove('hidden');
-        }
 
         function handleImageUpload(slotNumber, event) {
             const file = event.target.files[0];
@@ -1410,6 +1365,9 @@
                 document.getElementById('resultBox').innerHTML = formatAnalysisResult(currentAnalysis);
                 document.getElementById('resultSection').classList.remove('hidden');
 
+                // Scroll to top of result
+                document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
             } catch (error) {
                 console.error('Fehler:', error);
                 document.getElementById('loadingSection').classList.add('hidden');
@@ -1438,6 +1396,7 @@
             let urgency = 5, rarity = 5, historicalValue = 5, condition = 5;
             let overall = 'MITTEL';
             let justification = '';
+            let dating = 'Unbekannt';
 
             if (priorityMatch) {
                 const pText = priorityMatch[1];
@@ -1447,6 +1406,7 @@
                 condition = parseInt(pText.match(/ZUSTAND:\s*(\d+)/i)?.[1] || '5');
                 overall = pText.match(/GESAMT:\s*([A-Z]+)/i)?.[1] || 'MITTEL';
                 justification = pText.match(/BEGRÜNDUNG:\s*(.+)/i)?.[1]?.trim() || '';
+                dating = pText.match(/DATIERUNG:\s*(.+)/i)?.[1]?.trim() || 'Unbekannt';
             }
 
             const overallClass = overall.toLowerCase().replace(/ü/g, 'u');
@@ -1510,6 +1470,9 @@
                         <div class="priority-badge ${overallClass}">
                             ${badgeIcon}
                         </div>
+                        <div style="margin-top: 10px; font-weight: bold; color: #666;">
+                            🕒 ${dating}
+                        </div>
                     </div>
                     <div class="priority-gauges">
                         <div class="gauge-container">
@@ -1551,7 +1514,7 @@
                 { id: '2', title: 'Zustandsanalyse', icon: '📋', theme: 'purple' },
                 { id: '3', title: 'Risikobewertung', icon: '⚠️', theme: 'red' },
                 { id: '4', title: 'Konservierungskonzept', icon: '🛡️', theme: 'green' },
-                { id: '5', title: 'Spezielle Anforderungen', icon: '🎯', theme: 'orange' },
+                { id: '5', title: 'Handlungsempfehlungen', icon: '🎯', theme: 'orange' },
                 { id: '6', title: 'Quellen & Literatur', icon: '📚', theme: 'amber' }
             ];
 
@@ -1589,14 +1552,6 @@
         }
 
         function buildConservationPrompt() {
-            const usageTexts = {
-                'exhibition': 'Dauerausstellung (Artefakt wird dauerhaft ausgestellt)',
-                'temporary': 'Wechselausstellung (Temporäre Ausstellung)',
-                'storage': 'Langzeitlagerung im Depot (Optimale Konservierung)',
-                'transport': 'Transport (Sicherer Transport)'
-            };
-
-            const usage = selectedUsage ? usageTexts[selectedUsage] : 'Nicht angegeben';
             const today = new Date().toLocaleDateString('de-AT', { year: 'numeric', month: 'long', day: 'numeric' });
 
             return `ROLLE: Du bist ein konservativer, streng wissenschaftlicher Museumskurator und Restaurator mit 30 Jahren Erfahrung.
@@ -1605,19 +1560,21 @@ TONFALL: Sachlich, präzise, akademisch. Vermeide blumige Sprache. Faktenbasiert
 
 KONTEXT:
 - Datum: ${today}
-- Geplante Nutzung: ${usage}
 
-ANWEISUNG ZUR BEWERTUNG (SCORING):
-Nutze diese Skala streng objektiv. Sei kritisch!
-- 1-2: Massenware / Irreparabel zerstört / Kein historischer Wert
-- 3-5: Häufiges Objekt / Deutliche Schäden / Lokale Bedeutung
-- 6-8: Gehobene Qualität / Gute Substanz / Überregionale Bedeutung
-- 9-10: Unikat / Perfekter Originalzustand / Welterbe-Niveau
+ANWEISUNG ZUR BEWERTUNG (SCORING) - SEHR STRENG SEIN:
+- 1: Massenware / Industrieprodukt (auch Vintage 50er-80er Jahre) / Häufig
+- 2-3: Gehobene Manufakturarbeit / Dekorativ
+- 4-6: Historisch relevant / Gute Handwerkskunst
+- 7-8: Museal bedeutend / Selten
+- 9-10: Unikat / Welterbe-Niveau
+
+WICHTIG: Vintage-Objekte (z.B. Taschenuhren, Kameras, Radios) aus Massenproduktion sind NICHT selten und haben meist geringen historischen Wert -> Score 1-2!
 
 FORMATIERUNG (STRENG EINHALTEN):
 Nutze exakt diese Trenner. Keine Markdown-Formatierung (kein Fett/Kursiv) innerhalb der Datenfelder.
 
 ###SECTION_START: PRIORITY###
+DATIERUNG: [Geschätzter Zeitraum, z.B. "ca. 1950er Jahre"]
 DRINGLICHKEIT: [Zahl 1-10]
 SELTENHEIT: [Zahl 1-10]
 WERT: [Zahl 1-10]
@@ -1627,11 +1584,11 @@ BEGRÜNDUNG: [Kurzer, prägnanter Satz]
 ###SECTION_END: PRIORITY###
 
 ###SECTION_START: 1###
-[Hier wissenschaftliche Materialanalyse. Nutze Absätze für Lesbarkeit. Keine Aufzählungszeichen, sondern Fließtext oder strukturierte Blöcke.]
+[Hier wissenschaftliche Materialanalyse. Nutze Absätze für Lesbarkeit.]
 ###SECTION_END: 1###
 
 ###SECTION_START: 2###
-[Detaillierte Zustandsanalyse. Beschreibe Schäden topographisch (oben, unten, links, rechts).]
+[Detaillierte Zustandsanalyse. Beschreibe Schäden topographisch.]
 ###SECTION_END: 2###
 
 ###SECTION_START: 3###
@@ -1639,14 +1596,21 @@ BEGRÜNDUNG: [Kurzer, prägnanter Satz]
 ###SECTION_END: 3###
 
 ###SECTION_START: 4###
-[Konservierungskonzept. Nenne konkrete Werte für Klima (Temp/rF) und Licht (Lux).]
+[Konservierungskonzept (Basis). Klima (Temp/rF) und Licht (Lux).]
 ###SECTION_END: 4###
 
-${selectedUsage !== 'storage' ? `
 ###SECTION_START: 5###
-[Spezielle Anforderungen für ${usage}. Was ist zusätzlich zu beachten?]
+HANDLUNGSEMPFEHLUNGEN FÜR VERSCHIEDENE SZENARIEN:
+
+A. LANGZEITLAGERUNG (DEPOT):
+[Spezifische Anweisungen für das Depot]
+
+B. DAUERAUSSTELLUNG:
+[Was ist bei einer Ausstellung zu beachten? Max. Licht, Vitrine?]
+
+C. TRANSPORT:
+[Wie muss das Objekt verpackt werden?]
 ###SECTION_END: 5###
-` : ''}
 
 ###SECTION_START: 6###
 [Quellenverzeichnis. Mindestens 3 relevante Fachquellen/Normen.]
@@ -1655,14 +1619,13 @@ ${selectedUsage !== 'storage' ? `
 WICHTIG:
 - Keine Markdown-Sternchen (**) verwenden!
 - Halte dich strikt an die Struktur.
-- Sei extrem kritisch bei der Bewertung. Eine 8-10 ist eine absolute Ausnahme.`;
+- Sei extrem kritisch bei der Bewertung.`;
         }
 
         function newAnalysis() {
             // Reset
             images = [null, null, null, null, null, null];
             contextTexts = ['', '', '', '', '', ''];
-            selectedUsage = null;
             currentAnalysis = null;
 
             // UI Reset
@@ -1674,13 +1637,8 @@ WICHTIG:
                 document.getElementById('slot' + i).classList.remove('has-image');
             }
 
-            document.querySelectorAll('.usage-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-
             document.getElementById('resultSection').classList.add('hidden');
-            document.getElementById('usageSection').classList.remove('hidden');
-            document.getElementById('uploadSection').classList.add('hidden');
+            document.getElementById('uploadSection').classList.remove('hidden');
             document.getElementById('analyzeBtn').disabled = true;
             hideError();
         }
@@ -1689,16 +1647,10 @@ WICHTIG:
             if (!currentAnalysis) return;
 
             const timestamp = new Date().toLocaleString('de-AT');
-            const usageTexts = {
-                'exhibition': 'Dauerausstellung',
-                'temporary': 'Wechselausstellung',
-                'storage': 'Langzeitlagerung',
-                'transport': 'Transport'
-            };
+            const timestamp = new Date().toLocaleString('de-AT');
 
             let content = `KONSERVIERUNGS-ANALYSE\n${'='.repeat(70)}\n`;
             content += `Zeitpunkt: ${timestamp}\n`;
-            content += `Verwendungszweck: ${usageTexts[selectedUsage] || 'Nicht angegeben'}\n`;
             content += `${'='.repeat(70)}\n\n`;
 
             // Kontext-Informationen
@@ -1753,15 +1705,6 @@ WICHTIG:
             pdf.setFont(undefined, 'normal');
             const timestamp = new Date().toLocaleString('de-AT');
             pdf.text(`Zeitpunkt: ${timestamp}`, margin, yPosition);
-            yPosition += 6;
-
-            const usageTexts = {
-                'exhibition': 'Dauerausstellung',
-                'temporary': 'Wechselausstellung',
-                'storage': 'Langzeitlagerung',
-                'transport': 'Transport'
-            };
-            pdf.text(`Verwendungszweck: ${usageTexts[selectedUsage] || 'Nicht angegeben'}`, margin, yPosition);
             yPosition += 10;
 
             // Bilder hinzufügen

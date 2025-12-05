@@ -135,7 +135,7 @@ Heimatverein Vorchdorf
 
 ## 🔄 Version
 
-**Version 2.16** (Dezember 2024)
+**Version 2.17** (Dezember 2024)
 
 ---
 
