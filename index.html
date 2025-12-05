@@ -850,6 +850,14 @@
             background: linear-gradient(to bottom, #fffbeb, white);
         }
 
+        .section-orange .section-header {
+            background: linear-gradient(to right, #9a3412, #ea580c);
+        }
+
+        .section-orange .section-body {
+            background: linear-gradient(to bottom, #fff7ed, white);
+        }
+
         /* Content Formatting */
         .section-body p {
             margin-bottom: 16px;
@@ -906,7 +914,7 @@
                 <div class="header-icon">🏛️</div>
                 <div>
                     <div class="header-title">KONSERVIEREN <span
-                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.8</span></div>
+                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.9</span></div>
                     <div class="header-subtitle">Artefakt-Analyse für Museum & Archiv</div>
                 </div>
             </div>
@@ -1471,13 +1479,20 @@
             }
 
             // Define sections with their color themes
+            // Note: Section numbers might be 5 or 6 for sources depending on whether usage-specific section exists
             const sections = [
                 { number: 1, title: 'Material-Identifikation', icon: '🔬', theme: 'blue' },
                 { number: 2, title: 'Zustandsanalyse', icon: '📋', theme: 'purple' },
                 { number: 3, title: 'Risikobewertung', icon: '⚠️', theme: 'red' },
                 { number: 4, title: 'Konservierungskonzept', icon: '🛡️', theme: 'green' },
-                { number: 5, title: 'Quellen & Literatur', icon: '📚', theme: 'amber' }
+                { number: 5, title: 'Spezielle Anforderungen', icon: '🎯', theme: 'orange' }, // Only for non-storage
+                { number: 6, title: 'Quellen & Literatur', icon: '📚', theme: 'amber' }  // Sources (section 6 if usage-specific exists)
             ];
+
+            // Handle section 5 (sources) as fallback if section 6 doesn't exist
+            const hasSectionFive = text.match(/\n5\.\s*[^\n]+/);
+            const hasSectionSix = text.match(/\n6\.\s*[^\n]+/);
+
 
             sections.forEach(section => {
                 const regex = new RegExp(`${section.number}\\.\\s*[^\\n]+\\n([\\s\\S]*?)(?=\\n\\n\\d+\\.|$)`, 'i');
@@ -1507,10 +1522,15 @@
                         content = '<p>' + content + '</p>';
                     }
 
-                    // Special handling for sources section
-                    if (section.number === 5) {
-                        const urlRegex = /(https?:\/\/[^\s<)]+)/g;
-                        content = content.replace(urlRegex, '<a href="$1" target="_blank">🔗 $1</a>');
+
+                    // Special handling for sources section (can be 5 or 6)
+                    if (section.number === 5 || section.number === 6) {
+                        // Check if this section contains sources by looking for "QUELLEN" or "LITERATUR" in title
+                        const isSources = /quellen|literatur/i.test(content) || section.title.includes('Quellen');
+                        if (isSources) {
+                            const urlRegex = /(https?:\/\/[^\s<)]+)/g;
+                            content = content.replace(urlRegex, '<a href="$1" target="_blank">🔗 $1</a>');
+                        }
                     }
 
                     html += `
@@ -1581,15 +1601,24 @@ Bitte erstelle ein professionelles Konservierungsgutachten mit folgenden Punkten
 3. RISIKOBEWERTUNG (Risk Assessment):
    - Akute Gefahren für die Substanz
    - Langfristige Degradationsprozesse
-   - Risiken durch den geplanten Verwendungszweck (${usage})
+   - Allgemeine Risiken bei Lagerung
 
-4. KONSERVIERUNGSKONZEPT (Maßnahmen):
+4. KONSERVIERUNGSKONZEPT FÜR LANGZEITLAGERUNG (Basis-Maßnahmen):
    - Präventive Konservierung (Klima, Licht, Lagerung) mit KONKRETEN WERTEN (Lux, µW/lm, °C, rF%)
    - Konservatorische Sicherungsmaßnahmen (nur reversible Eingriffe)
    - Restaurierungsvorschläge (falls ästhetisch oder strukturell notwendig)
    - Empfohlene Materialien für Lagerung/Verpackung (z.B. "säurefreies Seidenpapier nach ISO 9706")
 
-5. QUELLENVERZEICHNIS & LITERATUR:
+${selectedUsage !== 'storage' ? `
+5. SPEZIELLE ANFORDERUNGEN FÜR: ${usage.toUpperCase()}:
+   - Was ist ZUSÄTZLICH zur Langzeitlagerung zu beachten?
+   - Spezifische Risiken durch ${selectedUsage === 'exhibition' ? 'dauerhafte Ausstellung' : selectedUsage === 'temporary' ? 'Transport und wechselnde Bedingungen' : 'Transport'}
+   - Besondere Schutzmaßnahmen
+   - Monitoring und regelmäßige Kontrollen
+   - Empfohlene maximale Ausstellungsdauer (falls zutreffend)
+` : ''}
+
+${selectedUsage !== 'storage' ? '6' : '5'}. QUELLENVERZEICHNIS & LITERATUR:
    - Liste am Ende UNBEDINGT die verwendeten wissenschaftlichen Quellen, Normen und Richtlinien auf.
    - Zitiere relevante Standards (DIN, EN, ISO) oder Fachliteratur (z.B. ICOM-CC, IIC).
    - Gib Links zu vertrauenswürdigen Online-Ressourcen an (z.B. hornemann-institut.de, canada.ca/conservation, etc.).
@@ -1600,6 +1629,7 @@ WICHTIG:
 - Verwende die korrekte Fachterminologie.
 - Gib am Ende IMMER eine Liste der verwendeten Quellen und Links an.
 - Verwende das heutige Datum (${today}) wenn du ein Begutachtungsdatum angibst.
+- Die Basis-Analyse ist IMMER für Langzeitlagerung. Nur wenn ein anderer Verwendungszweck gewählt wurde, füge Abschnitt 5 hinzu.
 
 Antworte auf Deutsch in einem strukturierten, gut lesbaren Format.`;
         }
