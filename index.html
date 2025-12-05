@@ -755,8 +755,15 @@
         }
 
         .gauge-label {
-            display: none;
-            /* Hide redundant label text */
+            font-size: 10px;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            /* Space between label and circle */
+            height: auto;
+            display: block;
         }
 
         .gauge-description {
@@ -918,7 +925,7 @@
                 <div class="header-icon">🏛️</div>
                 <div>
                     <div class="header-title">KONSERVIEREN <span
-                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.14</span></div>
+                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.15</span></div>
                     <div class="header-subtitle">Artefakt-Analyse für Museum & Archiv</div>
                 </div>
             </div>
@@ -1513,31 +1520,31 @@
                         </div>
                         <div class="priority-gauges">
                             <div class="gauge-container">
+                                <div class="gauge-label">Dringlichkeit</div>
                                 <div class="gauge-circle" style="--gauge-value: ${urgency * 10}; --gauge-color: ${getUrgencyColor(urgency)};">
                                     <div class="gauge-inner">${urgency}</div>
                                 </div>
-                                <div class="gauge-label">Dringlichkeit</div>
                                 <div class="gauge-description">${getUrgencyLabel(urgency)}</div>
                             </div>
                             <div class="gauge-container">
+                                <div class="gauge-label">Seltenheit</div>
                                 <div class="gauge-circle" style="--gauge-value: ${rarity * 10}; --gauge-color: ${getRarityColor(rarity)};">
                                     <div class="gauge-inner">${rarity}</div>
                                 </div>
-                                <div class="gauge-label">Seltenheit</div>
                                 <div class="gauge-description">${getRarityLabel(rarity)}</div>
                             </div>
                             <div class="gauge-container">
+                                <div class="gauge-label">Historischer Wert</div>
                                 <div class="gauge-circle" style="--gauge-value: ${historicalValue * 10}; --gauge-color: ${getValueColor(historicalValue)};">
                                     <div class="gauge-inner">${historicalValue}</div>
                                 </div>
-                                <div class="gauge-label">Historischer Wert</div>
                                 <div class="gauge-description">${getValueLabel(historicalValue)}</div>
                             </div>
                             <div class="gauge-container">
+                                <div class="gauge-label">Erhaltungszustand</div>
                                 <div class="gauge-circle" style="--gauge-value: ${condition * 10}; --gauge-color: ${getConditionColor(condition)};">
                                     <div class="gauge-inner">${condition}</div>
                                 </div>
-                                <div class="gauge-label">Zustand</div>
                                 <div class="gauge-description">${getConditionLabel(condition)}</div>
                             </div>
                         </div>
@@ -1562,8 +1569,18 @@
             const hasSectionSix = text.match(/\n6\.\s*[^\n]+/);
 
 
+            // Pre-process text to handle AI formatting quirks
+            // 1. Replace "---" with newlines
+            text = text.replace(/---/g, '\n\n');
+            // 2. Ensure numbered sections (e.g. "**1. Title**") are on their own lines
+            text = text.replace(/(\*\*|)\s*(\d+)\.\s+([^*]+)(\*\*|)/g, '\n$1$2. $3$4\n');
+            // 3. Clean up multiple newlines
+            text = text.replace(/\n{3,}/g, '\n\n');
+
             sections.forEach(section => {
-                const regex = new RegExp(`${section.number}\\.\\s*[^\\n]+\\n([\\s\\S]*?)(?=\\n\\n\\d+\\.|$)`, 'i');
+                // Regex to find section content: Look for "1. Title" ... content ... until next number "2." or end
+                // Added handling for potential ** around the number/title
+                const regex = new RegExp(`(?:\\*\\*|)\\s*${section.number}\\.\\s*[^\\n]+\\n([\\s\\S]*?)(?=\\n(?:\\*\\*|)\\s*\\d+\\.|$)`, 'i');
                 const match = text.match(regex);
 
                 if (match) {
