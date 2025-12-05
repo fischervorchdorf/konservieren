@@ -925,7 +925,7 @@
                 <div class="header-icon">🏛️</div>
                 <div>
                     <div class="header-title">KONSERVIEREN <span
-                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.17</span></div>
+                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.18</span></div>
                     <div class="header-subtitle">Artefakt-Analyse für Museum & Archiv</div>
                 </div>
             </div>
@@ -1693,86 +1693,153 @@ WICHTIG:
             const contentWidth = pageWidth - 2 * margin;
             let yPosition = margin;
 
-            // Titel
+            // --- HEADER ---
             pdf.setFontSize(18);
             pdf.setFont(undefined, 'bold');
+            pdf.setTextColor(33, 33, 33);
             pdf.text('KONSERVIERUNGS-ANALYSE', margin, yPosition);
-            yPosition += 10;
+            yPosition += 8;
 
             // Metadata
             pdf.setFontSize(10);
             pdf.setFont(undefined, 'normal');
+            pdf.setTextColor(100, 100, 100);
             const timestamp = new Date().toLocaleString('de-AT');
             pdf.text(`Zeitpunkt: ${timestamp}`, margin, yPosition);
-            yPosition += 10;
+            yPosition += 15;
 
-            // Bilder hinzufügen
+            // --- BILDER ---
             const imageCount = images.filter(img => img !== null).length;
             if (imageCount > 0) {
                 pdf.setFontSize(12);
                 pdf.setFont(undefined, 'bold');
-                pdf.text('BILDER:', margin, yPosition);
+                pdf.setTextColor(0, 0, 0);
+                pdf.text('DOKUMENTATION:', margin, yPosition);
                 yPosition += 8;
 
                 for (let i = 0; i < images.length; i++) {
                     if (images[i]) {
-                        // Neue Seite wenn nötig
+                        // Check Page Break
                         if (yPosition > pageHeight - 80) {
                             pdf.addPage();
                             yPosition = margin;
                         }
 
-                        pdf.setFontSize(10);
-                        pdf.setFont(undefined, 'bold');
-                        pdf.text(`Bild ${i + 1}:`, margin, yPosition);
-                        yPosition += 6;
-
-                        // Kontext-Info
-                        if (contextTexts[i]) {
-                            pdf.setFont(undefined, 'italic');
-                            const contextLines = pdf.splitTextToSize(`Kontext: ${contextTexts[i]}`, contentWidth);
-                            pdf.text(contextLines, margin, yPosition);
-                            yPosition += contextLines.length * 5 + 4;
-                        }
-
                         // Bild einfügen
                         const imgWidth = contentWidth;
                         const imgHeight = 60;
+
+                        // Optional: Aspect Ratio check could be added here, but keeping it simple fixed height for grid look
                         pdf.addImage(images[i], 'JPEG', margin, yPosition, imgWidth, imgHeight);
-                        yPosition += imgHeight + 10;
+
+                        // Context Text overlay or below? Below is safer for PDF.
+                        if (contextTexts[i]) {
+                            yPosition += imgHeight + 5;
+                            pdf.setFontSize(9);
+                            pdf.setFont(undefined, 'italic');
+                            pdf.setTextColor(80, 80, 80);
+                            const contextLines = pdf.splitTextToSize(`Bild ${i + 1}: ${contextTexts[i]}`, contentWidth);
+                            pdf.text(contextLines, margin, yPosition);
+                            yPosition += contextLines.length * 4 + 5;
+                        } else {
+                            yPosition += imgHeight + 5;
+                        }
                     }
                 }
             }
 
-            // Neue Seite für Analyse
+            // --- ANALYSE SECTIONS ---
+            // Page Break for Analysis Start
             pdf.addPage();
             yPosition = margin;
 
-            pdf.setFontSize(12);
+            pdf.setFontSize(14);
             pdf.setFont(undefined, 'bold');
-            pdf.text('KONSERVIERUNGS-ANALYSE:', margin, yPosition);
-            yPosition += 8;
+            pdf.setTextColor(0, 0, 0);
+            pdf.text('ERGEBNISSE:', margin, yPosition);
+            yPosition += 10;
 
-            // Analyse-Text
-            pdf.setFontSize(9);
-            pdf.setFont(undefined, 'normal');
-            const lines = pdf.splitTextToSize(currentAnalysis, contentWidth);
+            // Define Sections and Colors (matching CSS)
+            const sections = [
+                { id: 'PRIORITY', title: 'ZUSAMMENFASSUNG & PRIORITÄT', icon: '⚡', color: [234, 88, 12] }, // Orange-600 like
+                { id: '1', title: 'MATERIAL-IDENTIFIKATION', icon: '🔬', color: [37, 99, 235] }, // Blue-600
+                { id: '2', title: 'ZUSTANDSANALYSE', icon: '📋', color: [147, 51, 234] }, // Purple-600
+                { id: '3', title: 'RISIKOBEWERTUNG', icon: '⚠️', color: [220, 38, 38] }, // Red-600
+                { id: '4', title: 'KONSERVIERUNGSKONZEPT', icon: '🛡️', color: [22, 163, 74] }, // Green-600
+                { id: '5', title: 'HANDLUNGSEMPFEHLUNGEN', icon: '🎯', color: [234, 88, 12] }, // Orange-600
+                { id: '6', title: 'QUELLEN & LITERATUR', icon: '📚', color: [217, 119, 6] }  // Amber-600
+            ];
 
-            for (let i = 0; i < lines.length; i++) {
-                if (yPosition > pageHeight - margin) {
+            // Helper to parse section content
+            const getSectionContent = (id) => {
+                const regex = new RegExp(`###SECTION_START: ${id}###([\\s\\S]*?)###SECTION_END: ${id}###`);
+                const match = currentAnalysis.match(regex);
+                return match ? match[1].trim() : null;
+            };
+
+            sections.forEach(section => {
+                let content = getSectionContent(section.id);
+                if (!content) return;
+
+                // Clean content
+                content = content.replace(/\*\*/g, ''); // Remove bold markers
+
+                // Special handling for Priority to make it readable
+                if (section.id === 'PRIORITY') {
+                    // Format Priority nicely
+                    const lines = content.split('\n').filter(l => l.trim() !== '');
+                    content = lines.join('\n');
+                }
+
+                // Check space for Header + at least 3 lines of text
+                if (yPosition > pageHeight - 40) {
                     pdf.addPage();
                     yPosition = margin;
                 }
-                pdf.text(lines[i], margin, yPosition);
-                yPosition += 5;
+
+                // --- DRAW HEADER BLOCK ---
+                pdf.setFillColor(...section.color);
+                pdf.rect(margin, yPosition, contentWidth, 10, 'F');
+
+                // Header Text
+                pdf.setTextColor(255, 255, 255);
+                pdf.setFontSize(10);
+                pdf.setFont(undefined, 'bold');
+                // Note: jsPDF doesn't support emoji well in standard fonts. 
+                // We will use just the title for reliability, or try to map simple ones.
+                // For safety/compatibility, we stick to text title in the block.
+                pdf.text(section.title, margin + 2, yPosition + 7);
+
+                yPosition += 15;
+
+                // --- DRAW BODY CONTENT ---
+                pdf.setTextColor(0, 0, 0);
+                pdf.setFontSize(10);
+                pdf.setFont(undefined, 'normal');
+
+                const splitLines = pdf.splitTextToSize(content, contentWidth);
+
+                for (let i = 0; i < splitLines.length; i++) {
+                    if (yPosition > pageHeight - margin) {
+                        pdf.addPage();
+                        yPosition = margin;
+                    }
+                    pdf.text(splitLines[i], margin, yPosition);
+                    yPosition += 5;
+                }
+
+                yPosition += 5; // Spacing after section
+            });
+
+            // Footer
+            const pageCount = pdf.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                pdf.setPage(i);
+                pdf.setFontSize(8);
+                pdf.setTextColor(150, 150, 150);
+                pdf.text(`Seite ${i} von ${pageCount} | Powered by Heimatverein Vorchdorf`, margin, pageHeight - 10);
             }
 
-            // Footer auf letzter Seite
-            pdf.setFontSize(8);
-            pdf.setFont(undefined, 'italic');
-            pdf.text('Powered by Heimatverein Vorchdorf', margin, pageHeight - 10);
-
-            // PDF speichern
             pdf.save(`Konservierung_${Date.now()}.pdf`);
         }
 
