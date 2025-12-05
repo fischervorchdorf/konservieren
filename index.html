@@ -541,17 +541,7 @@
         }
 
         .result-box {
-            background: white;
-            padding: 24px;
-            border-radius: 12px;
-            border: 2px solid var(--museum-stone);
-            margin-bottom: 20px;
-            white-space: pre-wrap;
-            line-height: 1.8;
-            color: var(--museum-charcoal);
-            max-height: 600px;
-            overflow-y: auto;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            /* No background, padding, or constraints - sections flow naturally */
         }
 
         .action-buttons {
@@ -787,7 +777,7 @@
 
         /* Section Blocks - Colorful Gradients */
         .section-block {
-            margin-bottom: 32px;
+            margin-bottom: 48px;
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
@@ -826,8 +816,16 @@
             background: linear-gradient(to right, #0c4a6e, #0f766e);
         }
 
+        .section-blue .section-body {
+            background: linear-gradient(to bottom, #e0f2fe, white);
+        }
+
         .section-purple .section-header {
             background: linear-gradient(to right, #581c87, #4338ca);
+        }
+
+        .section-purple .section-body {
+            background: linear-gradient(to bottom, #ede9fe, white);
         }
 
         .section-red .section-header {
@@ -840,6 +838,10 @@
 
         .section-green .section-header {
             background: linear-gradient(to right, #064e3b, #14532d);
+        }
+
+        .section-green .section-body {
+            background: linear-gradient(to bottom, #d1fae5, white);
         }
 
         .section-amber .section-header {
@@ -914,7 +916,7 @@
                 <div class="header-icon">🏛️</div>
                 <div>
                     <div class="header-title">KONSERVIEREN <span
-                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.9</span></div>
+                            style="font-size: 12px; opacity: 0.7; font-weight: 400;">v2.10</span></div>
                     <div class="header-subtitle">Artefakt-Analyse für Museum & Archiv</div>
                 </div>
             </div>
