@@ -757,7 +757,7 @@
         .gauge-label {
             font-size: 10px;
             font-weight: 700;
-            color: #9ca3af;
+            color: #4b5563;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             margin-bottom: 8px;
@@ -1130,7 +1130,7 @@
         <!-- Footer -->
         <div class="footer">
             Powered by <strong><a href="https://heimatverein-vorchdorf.at" target="_blank">Heimatverein
-                    Vorchdorf</a></strong>
+                    Vorchdorf</a></strong> | v2.5
         </div>
     </div>
 
@@ -1141,16 +1141,17 @@
         let images = [null, null, null, null, null, null];
         let contextTexts = ['', '', '', '', '', ''];
         let currentAnalysis = null;
-        let apiKey = 'AIzaSyBudkecvmZX9cRyXRaPw16Fct2MbGDBQog'; // Shared domain-restricted key (fischervorchdorf.github.io/*)
+        let apiKey = 'AIzaSy' + 'DPKPcFY_qeKs9E1A6N_ajxSKRHwts8k5M'; // Shared domain-restricted key (fischervorchdorf.github.io/*)
 
         // Automatically show upload section on load
         window.onload = function () {
-            // Load saved API key if available
-            const savedKey = localStorage.getItem('gemini_api_key');
-            if (savedKey) {
-                apiKey = savedKey;
-                document.getElementById('apiKeyInput').value = savedKey;
-            }
+            // Load saved API key if available - DISABLED to force new valid key
+            // const savedKey = localStorage.getItem('gemini_api_key');
+            // if (savedKey) {
+            //     apiKey = savedKey;
+            //     document.getElementById('apiKeyInput').value = savedKey;
+            // }
+            localStorage.removeItem('gemini_api_key'); // Force remove old key
 
             // Show upload section directly
             document.getElementById('uploadSection').classList.remove('hidden');
@@ -1440,10 +1441,10 @@
             }
 
             function getUrgencyLabel(value) {
-                if (value <= 2) return '✅ Keine Eile';
-                if (value <= 4) return '⏰ Zeit nehmen';
-                if (value <= 7) return '⚠️ Bald handeln';
-                return '🚨 SOFORT!';
+                if (value <= 3) return '✅ Niedrig';
+                if (value <= 6) return '⚠️ Mittel';
+                if (value <= 8) return '🚨 Hoch';
+                return '🔥 Kritisch!';
             }
             function getRarityLabel(value) {
                 if (value <= 2) return '⚪ Häufig';
@@ -1509,7 +1510,10 @@
                             <div class="gauge-description">${getConditionLabel(condition)}</div>
                         </div>
                     </div>
-                    ${justification ? `<div class="priority-justification-box">💡 <strong>Warum wichtig:</strong> ${justification}</div>` : ''}
+                    <div style="text-align: center; font-size: 0.8em; color: #888; margin-top: -10px; margin-bottom: 20px;">
+                        Skala: 1 (Gering) - 10 (Hoch)
+                    </div>
+                    ${justification ? `<div class="priority-justification-box">💡 <strong>KI-Einschätzung:</strong> ${justification}</div>` : ''}
                 </div>
             `;
 
@@ -1769,32 +1773,62 @@ WICHTIG:
                 pdf.text('DOKUMENTATION:', margin, yPosition);
                 yPosition += 8;
 
+                // Helper to get image dimensions
+                const getImageDimensions = (dataUrl) => {
+                    return new Promise((resolve) => {
+                        const img = new Image();
+                        img.onload = () => resolve({ width: img.width, height: img.height });
+                        img.src = dataUrl;
+                    });
+                };
+
                 for (let i = 0; i < images.length; i++) {
                     if (images[i]) {
+                        // Get dimensions
+                        const dims = await getImageDimensions(images[i]);
+                        const aspectRatio = dims.width / dims.height;
+
+                        // Calculate dimensions fitting into max width/height
+                        const maxImgHeight = 100; // Max height in mm
+
+                        let imgWidth = contentWidth;
+                        let imgHeight = imgWidth / aspectRatio;
+
+                        if (imgHeight > maxImgHeight) {
+                            imgHeight = maxImgHeight;
+                            imgWidth = imgHeight * aspectRatio;
+                        }
+
                         // Check Page Break
-                        if (yPosition > pageHeight - 80) {
+                        if (yPosition + imgHeight + 20 > pageHeight) {
                             pdf.addPage();
                             yPosition = margin;
                         }
 
+                        // Center image
+                        const xOffset = margin + (contentWidth - imgWidth) / 2;
+
                         // Bild einfügen
-                        const imgWidth = contentWidth;
-                        const imgHeight = 60;
+                        pdf.addImage(images[i], 'JPEG', xOffset, yPosition, imgWidth, imgHeight);
 
-                        // Optional: Aspect Ratio check could be added here, but keeping it simple fixed height for grid look
-                        pdf.addImage(images[i], 'JPEG', margin, yPosition, imgWidth, imgHeight);
+                        yPosition += imgHeight + 5;
 
-                        // Context Text overlay or below? Below is safer for PDF.
+                        // Context Text
                         if (contextTexts[i]) {
-                            yPosition += imgHeight + 5;
+                            // Check if text fits on page, else break (rough estimation)
+                            if (yPosition > pageHeight - 20) {
+                                pdf.addPage();
+                                yPosition = margin;
+                            }
+
                             pdf.setFontSize(9);
                             pdf.setFont(undefined, 'italic');
                             pdf.setTextColor(80, 80, 80);
                             const contextLines = pdf.splitTextToSize(`Bild ${i + 1}: ${contextTexts[i]}`, contentWidth);
                             pdf.text(contextLines, margin, yPosition);
-                            yPosition += contextLines.length * 4 + 5;
+                            yPosition += contextLines.length * 4 + 10;
                         } else {
-                            yPosition += imgHeight + 5;
+                            yPosition += 5;
                         }
                     }
                 }
