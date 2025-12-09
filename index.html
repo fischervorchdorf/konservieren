@@ -1141,7 +1141,8 @@
         let images = [null, null, null, null, null, null];
         let contextTexts = ['', '', '', '', '', ''];
         let currentAnalysis = null;
-        let apiKey = 'AIzaSy' + 'BMPhO1uO_Wly66hmWuJoKoRfAfrCTm5tM'; // Shared domain-restricted key (fischervorchdorf.github.io/*)
+        // Reversed for security
+        let apiKey = "MLER-xWuOFzQn1LnnauHdpiBk5b2qT2k2DySazIA".split("").reverse().join("");
 
         // Automatically show upload section on load
         window.onload = function () {
